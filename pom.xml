@@ -11,6 +11,26 @@
 	<name>mi_card_maker</name>
 	<url>http://maven.apache.org</url>
 
+	<developers>
+		<developer>
+			<id>1</id>
+			<name>Michaela Lehotska</name>
+			<email></email>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+	<developer>
+		<id>2</id>
+		<name>Martin Krajcovic</name>
+		<email>mar.krajc@gmail.com</email>
+		<roles>
+			<role>developer</role>
+		</roles>
+	</developer>
+	</developers>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -18,5 +38,6 @@
 	</properties>
 
 	<dependencies>
+
 	</dependencies>
 </project>

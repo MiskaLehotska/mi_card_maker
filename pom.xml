@@ -21,14 +21,14 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-	<developer>
-		<id>2</id>
-		<name>Martin Krajcovic</name>
-		<email>mar.krajc@gmail.com</email>
-		<roles>
-			<role>developer</role>
-		</roles>
-	</developer>
+		<developer>
+			<id>2</id>
+			<name>Martin Krajcovic</name>
+			<email>mar.krajc@gmail.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<properties>
@@ -39,14 +39,37 @@
 
 	<dependencies>
 
-
-		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.4.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>5.3.22</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>5.3.22</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.9.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.9.0</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 </project>

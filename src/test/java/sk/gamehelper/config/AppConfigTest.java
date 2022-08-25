@@ -16,17 +16,20 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.transaction.TransactionManager;
 
-@TestInstance(Lifecycle.PER_CLASS)
+@TestInstance(Lifecycle.PER_CLASS) // toto je na to, aby sme mohli pouzivat v tejto metode nestaticku instancnu premennu a aby sa drzala pocas behu vsetkych testov
 class AppConfigTest {
 
 	private AnnotationConfigApplicationContext context;
 
+	// @BeforeAll logicky - co sa ma vykonat pred tym ako zacnu unit testy oznacene @Test anotaciou
 	@BeforeAll
 	void initAppContext() {
 		this.context = new AnnotationConfigApplicationContext(AppConfig.class);
 		context.registerShutdownHook();
 	}
 
+	// @Test hovori, ze ide o unit test, ktory ma testovaci framework JUnit 5 (jupiter) spustit
+	// @Display hovori, ze ako sa ma v tom lavom panely, ked to bude zelene zobrazit popis testu (nemusi to tu vobec byt a ostane tam nazov metody ako popis)
 	@DisplayName("DB DataSource initialization")
 	@Test
 	void datasourceTest() {
@@ -70,6 +73,7 @@ class AppConfigTest {
 			"If the database server is up and running - there should be no exception thrown");
 	}
 
+	// nakoniec sa vykona tato metoda po vsetkych testoch...uzavrie sa kontext springu pre tieto testy
 	@AfterAll
 	void closeContext() {
 		context.close();

@@ -14,8 +14,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @ComponentScan(basePackages = "sk.gamehelper")
-@EnableTransactionManagement
 @PropertySource("classpath:/db/connection.properties")
+@EnableTransactionManagement
 public class AppConfig {
 
 	@Bean

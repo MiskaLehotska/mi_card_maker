@@ -1,5 +1,7 @@
 package sk.gamehelper.config;
 
+import java.util.UUID;
+
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +17,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.transaction.TransactionManager;
+
+import sk.gamehelper.db.TransactionTestComponent;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class AppConfigTest {
@@ -37,10 +41,9 @@ class AppConfigTest {
 		String actualPassword = dataSource.getPassword();
 		String actualURL = dataSource.getUrl();
 
-		Assertions.assertAll(
-			() -> "postgres".equals(actualUsername),
-			() -> "postgres".equals(actualPassword),
-			() -> "jdbc:postgresql://localhost:5432/dd".equals(actualURL));
+		Assertions.assertTrue("postgres".equals(actualUsername), "username should be postgres but was " + actualUsername);
+		Assertions.assertTrue("postgres".equals(actualPassword), "password should be pwd but was " + actualPassword);
+		Assertions.assertTrue("jdbc:postgresql://localhost:5432/dd".equals(actualURL));
 	}
 
 	@DisplayName("DB JdbcTemplate initialization")
@@ -62,12 +65,28 @@ class AppConfigTest {
 				"dataSource object used by jdbcTemplate should be of type SingleConnectionDataSource");
 	}
 
-	@Disabled("until the database is available for this project")
+	@Disabled("until local database is available")
 	@DisplayName("DB Connection test")
 	@Test
 	void connectionTest() {
 		Assertions.assertDoesNotThrow(() -> context.getBean(DataSource.class).getConnection(),
 			"If the database server is up and running - there should be no exception thrown");
+	}
+
+	@Disabled("until local database is available")
+	@DisplayName("DB rollback from invalid transaction")
+	@Test
+	void txRollbackTest() {
+		TransactionTestComponent txTest = context.getBean(TransactionTestComponent.class);
+		UUID uuid = txTest.getUUID();
+		try {
+			txTest.insertWithException();
+		} catch (Exception ex) {
+			// do nothing
+		}
+		String uuidDb = txTest.getDbUUID();
+		Assertions.assertFalse(uuid.toString().equals(uuidDb), 
+			"The transaction should be rollbacked! Insert id: " + uuid + " Select id: " + uuidDb);
 	}
 
 	@AfterAll

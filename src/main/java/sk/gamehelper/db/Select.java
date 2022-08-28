@@ -49,7 +49,6 @@ public final class Select {
 		return this;
 	}
 
-	// TODO: these wheres should be appended at the total end because of joins
 	public Select where(String column, Object value) {
 		appendWhereClauseConnector();
 		whereBuilder.append(column);
@@ -89,15 +88,12 @@ public final class Select {
 	}
 
 	public Join join(String table) {
-		return new Join(this, table);
+		return new Join(table);
 	}
 
 	public class Join {
 
-		private Select select;
-
-		public Join(Select select, String table) {
-			this.select = select;
+		public Join(String table) {
 			selectBuilder.append(" JOIN " + table);
 		}
 
@@ -106,7 +102,7 @@ public final class Select {
 			selectBuilder.append(leftColumn);
 			selectBuilder.append(" = ");
 			selectBuilder.append(rightColumn);
-			return this.select;
+			return Select.this;
 		}
 	}
 
@@ -165,5 +161,10 @@ public final class Select {
 
 	private static void logSelect(CharSequence select) {
 		logger.info("executing: " + select);
+	}
+	
+	@Override
+	public String toString() {
+		return this.selectBuilder.append(this.whereBuilder).toString();
 	}
 }

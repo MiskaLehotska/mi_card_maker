@@ -38,6 +38,12 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 		return this;
 	}
 
+	@Override
+	protected Map<String, Object> getAsMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public Long getId() {
 		return id;
 	}

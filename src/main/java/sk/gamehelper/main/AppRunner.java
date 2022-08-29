@@ -5,6 +5,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
+import sk.gamehelper.db.QueryOperator;
 
 public class AppRunner {
 
@@ -18,19 +19,19 @@ public class AppRunner {
 			// give me coin id by coin acronym (gp)
 			Long coinId = db.select("n_id")
 				.from("card_enum.e_coin")
-				.where("s_acronym", "gp")
+				.where("s_acronym", QueryOperator.LIKE, "g")
 				.asLong();
 
-			// give me category id by category name (Armor)
+			// give me category id 1
 			Long categoryId = db.select("n_id")
 				.from("card_enum.e_category")
-				.where("s_name", "Armor")
+				.where("n_id", QueryOperator.LESS_THAN, 2)
 				.asLong();
 			
 			// give me rarity id by rarity name (Uncommon)
 			Long rarityId = db.select("n_id")
 				.from("card_enum.e_rarity")
-				.where("s_name", "Uncommon")
+				.where("s_name", "Uncommon") // QueryOperator.EQUALS je default
 				.asLong();
 
 			// create magic item and set the desired values
@@ -48,7 +49,6 @@ public class AppRunner {
 			
 			// select magic item record by ID just retrieved from the insert operation
 			System.out.println(new MagicItem().selectById(newId));
-
 		}
 	}
 }

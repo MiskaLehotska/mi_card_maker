@@ -50,14 +50,7 @@ public final class Select {
 	}
 
 	public Select where(String column, Object value) {
-		appendWhereClauseConnector();
-		whereBuilder.append(column);
-		whereBuilder.append(" = ");
-		if (value instanceof CharSequence) {
-			value = "'" + value + "'";
-		}
-		whereBuilder.append(value);
-		return this;
+		return where(column, QueryOperator.EQUALS, value);
 	}
 
 	public Select where(String column, Select innerSelect) {
@@ -75,6 +68,13 @@ public final class Select {
 			customWhere = customWhere.replace("WHERE ", "");
 		}
 		whereBuilder.append(customWhere);
+		return this;
+	}
+
+	public Select where(String column, QueryOperator queryOperator, Object value) {
+		appendWhereClauseConnector();
+		whereBuilder.append(column);
+		whereBuilder.append(queryOperator.applyOperationOnValue(value));
 		return this;
 	}
 

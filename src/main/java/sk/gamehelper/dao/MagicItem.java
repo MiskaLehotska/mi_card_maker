@@ -1,5 +1,6 @@
 package sk.gamehelper.dao;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,24 +25,34 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 	}
 
 	@Override
-	protected MagicItem setByData(Map<String, Object> data) {
-		this.id = (Long) data.get("n_id");
+	public MagicItem setByData(Map<String, Object> data) {
+		this.id = Long.valueOf(data.get("n_id").toString());
 		this.uuid = (UUID) data.get("u_uid_id");
 		this.title = (String) data.get("s_title");
 		this.description = (String) data.get("s_description");
-		this.categoryId = (Long) data.get("n_category_id");
-		this.rarityId = (Long) data.get("n_rarity_id");
+		this.categoryId = Long.valueOf(data.get("n_category_id").toString());
+		this.rarityId = Long.valueOf(data.get("n_rarity_id").toString());
 		this.price = (Integer) data.get("n_price");
-		this.coinId = (Long) data.get("n_coin_id");
+		this.coinId = Long.valueOf(data.get("n_coin_id").toString());
 		this.attunement = (Boolean) data.get("b_attunement");
 		
 		return this;
 	}
 
 	@Override
-	protected Map<String, Object> getAsMap() {
-		// TODO Auto-generated method stub
-		return null;
+	protected Map<String, Object> getAsDbRow() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("n_id", this.id);
+		map.put("u_uid_id", this.uuid);
+		map.put("s_title", this.title);
+		map.put("s_description", this.description);
+		map.put("n_category_id", this.categoryId);
+		map.put("n_rarity_id", this.rarityId);
+		map.put("n_price", this.price);
+		map.put("n_coin_id", this.coinId);
+		map.put("b_attunement", this.attunement);
+
+		return map;
 	}
 
 	public Long getId() {
@@ -114,6 +125,13 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 
 	public void setAttunement(Boolean attunement) {
 		this.attunement = attunement;
+	}
+
+	@Override
+	public String toString() {
+		return "MagicItem [id=" + id + ", uuid=" + uuid + ", title=" + title + ", description=" + description
+				+ ", categoryId=" + categoryId + ", rarityId=" + rarityId + ", price=" + price + ", coinId=" + coinId
+				+ ", attunement=" + attunement + "]";
 	}
 
 }

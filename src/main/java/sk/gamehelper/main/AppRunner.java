@@ -1,5 +1,8 @@
 package sk.gamehelper.main;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import sk.gamehelper.config.AppConfig;
@@ -49,6 +52,19 @@ public class AppRunner {
 			
 			// select magic item record by ID just retrieved from the insert operation
 			System.out.println(new MagicItem().selectById(newId));
+			
+			// print magic item record with resolved category and rarity
+			List<Map<String, Object>> magicItems = 
+				db.select("A.n_id", "A.s_title", "B.s_name AS category", "A.n_price", "C.s_acronym AS currency")
+					.from("card.t_magic_item A")
+					.join("card_enum.e_category B")
+					.on("A.n_category_id", "B.n_id")
+					.join("card_enum.e_coin C")
+					.on("A.n_coin_id", "C.n_id")
+					.where("A.n_id", QueryOperator.LESS_THAN, 3)
+					.asList();
+
+			magicItems.forEach(System.out::println);
 		}
 	}
 }

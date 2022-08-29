@@ -1,5 +1,6 @@
 package sk.gamehelper.main;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,12 @@ public class AppRunner {
 					.asList();
 
 			magicItems.forEach(System.out::println);
+
+			// select magic items where its id is one of 3, 4, or 7
+			magicItems = db.select()
+				.from("card.t_magic_item")
+				.whereIn("n_id", Arrays.asList(3, 4, 7))
+				.asList();
 		}
 	}
 }

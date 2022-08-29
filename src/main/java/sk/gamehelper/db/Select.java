@@ -3,6 +3,8 @@ package sk.gamehelper.db;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -15,6 +17,7 @@ public final class Select {
 	private StringBuilder selectBuilder;
 	private StringBuilder whereBuilder;
 	private boolean isWhereClauseApplied;
+	private boolean distinctAlreadyApplied;
 	private int requestedColumnsCount;
 
 	Select(JdbcTemplate jdbcTemplate, String... columns) {
@@ -40,6 +43,16 @@ public final class Select {
 		} else {
 			selectBuilder.append("*");
 		}
+		return this;
+	}
+
+	// TODO: how to apply distinct? on one column or on every column?
+	public Select distinct() {
+		if (distinctAlreadyApplied) {
+			return this;
+		}
+		this.distinctAlreadyApplied = true;
+		// TODO: apply distinct
 		return this;
 	}
 
@@ -78,6 +91,30 @@ public final class Select {
 		return this;
 	}
 
+	// NOTE: na between treba pouzit where(String customWhere) nakolko sa to asi nebude pouzivat
+	public <V> Select whereIn(String column, List<V> values) {
+		if (values.isEmpty()) {
+			// TODO: log that the method is not going to do anything on empty values
+			return this;
+		}
+		if (values.size() < 2) {
+			// TODO: log that the method is using basic equality where (or do something else?)
+			return where(column, values.get(0));
+		}
+
+		appendWhereClauseConnector();
+		whereBuilder.append(column);
+		whereBuilder.append(" IN (");
+
+		Stream<String> valuesJoiningStream = values.stream().map(String::valueOf);
+		if (values.get(0) instanceof CharSequence) {
+			valuesJoiningStream = valuesJoiningStream.map(val -> "'".concat(val).concat("'"));
+		}
+		whereBuilder.append(valuesJoiningStream.collect(Collectors.joining(",")));
+		whereBuilder.append(")");
+		return this;
+	}
+
 	private void appendWhereClauseConnector() {
 		if (isWhereClauseApplied) {
 			whereBuilder.append(" AND ");
@@ -106,11 +143,6 @@ public final class Select {
 		}
 	}
 
-	// TODO: add QueryOperators for where clause
-	// TODO: add whereIn
-	// TODO: add whereBetween
-	// TODO: add like support (QueryOperators)
-	// TODO: never implement OR
 	// TODO: add wherePreparedStatement() - dynamic values
 	// TODO: if it if nothing returns, let it do it without throwing an exception
 

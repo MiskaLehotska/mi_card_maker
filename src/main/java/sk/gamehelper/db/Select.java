@@ -46,13 +46,12 @@ public final class Select {
 		return this;
 	}
 
-	// TODO: how to apply distinct? on one column or on every column?
 	public Select distinct() {
 		if (distinctAlreadyApplied) {
 			return this;
 		}
-		this.distinctAlreadyApplied = true;
-		// TODO: apply distinct
+		distinctAlreadyApplied = true;
+		selectBuilder.append(" DISTINCT ");
 		return this;
 	}
 
@@ -128,10 +127,39 @@ public final class Select {
 		return new Join(table);
 	}
 
+	public Join leftJoin(String table) {
+		return new Join(table, Join.LEFT);
+	}
+
+	public Join leftOuterJoin(String table) {
+		return new Join(table, Join.LEFT_OUTER);
+	}
+
+	public Join rightJoin(String table) {
+		return new Join(table, Join.RIGHT);
+	}
+
+	public Join rightOuterJoin(String table) {
+		return new Join(table, Join.RIGHT_OUTER);
+	}
+
 	public class Join {
 
+		static final String JOIN = " JOIN ";
+		static final String INNER = " INNER";
+		static final String LEFT = " LEFT";
+		static final String RIGHT = " RIGHT";
+		static final String LEFT_OUTER = " LEFT OUTER";
+		static final String RIGHT_OUTER = " RIGHT OUTER";
+
 		public Join(String table) {
-			selectBuilder.append(" JOIN " + table);
+			this(table, ""); // INNER omitted for select logs clarity
+		}
+
+		public Join(String table, String joinType) {
+			selectBuilder.append(joinType);
+			selectBuilder.append(JOIN);
+			selectBuilder.append(table);
 		}
 
 		public Select on(String leftColumn, String rightColumn) {
@@ -139,6 +167,22 @@ public final class Select {
 			selectBuilder.append(leftColumn);
 			selectBuilder.append(" = ");
 			selectBuilder.append(rightColumn);
+			return Select.this;
+		}
+
+		public Select on(String leftColumn, String rightColumn, String... moreColumns) {
+			on(leftColumn, rightColumn);
+
+			int moreColumnsLength = moreColumns.length;
+			if (moreColumnsLength != 0 && moreColumnsLength % 2 == 0) {
+				for (int i = 0, j = 1; j < moreColumnsLength; i++, j++) {
+					selectBuilder.append(" AND ");
+					selectBuilder.append(moreColumns[i]);
+					selectBuilder.append(" = ");
+					selectBuilder.append(moreColumns[j]);
+				}
+			} 
+			// add some exception if moreColumns is not empty?
 			return Select.this;
 		}
 	}

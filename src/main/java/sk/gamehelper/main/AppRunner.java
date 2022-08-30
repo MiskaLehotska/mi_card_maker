@@ -58,7 +58,7 @@ public class AppRunner {
 			List<Map<String, Object>> magicItems = 
 				db.select("A.n_id", "A.s_title", "B.s_name AS category", "A.n_price", "C.s_acronym AS currency")
 					.from("card.t_magic_item A")
-					.join("card_enum.e_category B")
+					.leftJoin("card_enum.e_category B")
 					.on("A.n_category_id", "B.n_id")
 					.join("card_enum.e_coin C")
 					.on("A.n_coin_id", "C.n_id")
@@ -72,6 +72,15 @@ public class AppRunner {
 				.from("card.t_magic_item")
 				.whereIn("n_id", Arrays.asList(3, 4, 7))
 				.asList();
+			
+			// multiple columns ON clause
+			List<Map<String, Object>> data = db.select("A.*")
+				.from("card.t_magic_item A")
+				.join("card_enum.e_coin B")
+				.on("A.n_coin_id", "B.n_id", "A.n_category_id", "B.n_id")
+				.asList();
+
+			System.out.println(data.size());
 		}
 	}
 }

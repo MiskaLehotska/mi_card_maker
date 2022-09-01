@@ -10,8 +10,11 @@ public class Database {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private CMapRowMapper cMapRowMapper;
+
 	public Select select(String... columns) {
-		return new Select(jdbcTemplate, columns);
+		return new Select(jdbcTemplate, cMapRowMapper, columns);
 	}
 
 }

@@ -1,10 +1,9 @@
 package sk.gamehelper.dao;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import sk.gamehelper.db.DatabaseObject;
+import sk.gamehelper.helpers.CMap;
 
 public class MagicItem extends DatabaseObject<MagicItem> {
 
@@ -25,23 +24,23 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 	}
 
 	@Override
-	public MagicItem setByData(Map<String, Object> data) {
-		this.id = Long.valueOf(data.get("n_id").toString());
-		this.uuid = (UUID) data.get("u_uid_id");
-		this.title = (String) data.get("s_title");
-		this.description = (String) data.get("s_description");
-		this.categoryId = Long.valueOf(data.get("n_category_id").toString());
-		this.rarityId = Long.valueOf(data.get("n_rarity_id").toString());
-		this.price = (Integer) data.get("n_price");
-		this.coinId = Long.valueOf(data.get("n_coin_id").toString());
-		this.attunement = (Boolean) data.get("b_attunement");
-		
+	public MagicItem setByData(CMap data) {
+		this.id = data.getLong("n_id");
+		this.uuid = data.getUUID("u_uid_id");
+		this.title = data.getString("s_title");
+		this.description = data.getString("s_description");
+		this.categoryId = data.getLong("n_category_id");
+		this.rarityId = data.getLong("n_rarity_id");
+		this.price = data.getInteger("n_price");
+		this.coinId = data.getLong("n_coin_id");
+		this.attunement = data.getBoolean("b_attunement");
+
 		return this;
 	}
 
 	@Override
-	protected Map<String, Object> getAsDbRow() {
-		Map<String, Object> map = new HashMap<>();
+	protected CMap getAsDbRow() {
+		CMap map = new CMap();
 		map.put("n_id", this.id);
 		map.put("u_uid_id", this.uuid);
 		map.put("s_title", this.title);

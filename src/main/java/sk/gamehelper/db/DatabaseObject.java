@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import sk.gamehelper.config.AccessibleContext;
+import sk.gamehelper.helpers.CMap;
 
 public abstract class DatabaseObject<T> {
 
@@ -77,7 +78,7 @@ public abstract class DatabaseObject<T> {
 				.toString();
 	}
 
-	protected abstract T setByData(Map<String, Object> data);
+	protected abstract T setByData(CMap data);
 
-	protected abstract Map<String, Object> getAsDbRow();
+	protected abstract CMap getAsDbRow();
 }

@@ -2,14 +2,16 @@ package sk.gamehelper.helpers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 /**
  * Convertible map which provides convenient methods for getting value in
  * desired type if possible
  */
-public class CMap extends LinkedHashMap<String, Object> {
+public class CMap extends LinkedCaseInsensitiveMap<Object> {
 
 	private static final long serialVersionUID = -2690058775910305972L;
 
@@ -32,6 +34,10 @@ public class CMap extends LinkedHashMap<String, Object> {
 			Object secondObject = keyValuePairs[j];
 			put(firstObject, secondObject);
 		}
+	}
+
+	public CMap (Map<String, Object> map) {
+		putAll(map);
 	}
 
 	public Integer getInteger(String key) {

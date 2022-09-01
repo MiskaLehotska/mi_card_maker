@@ -1,12 +1,16 @@
 package sk.gamehelper.db;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import sk.gamehelper.helpers.CMap;
 
 // TODO: add documentation with hints
 public final class Select {
@@ -19,12 +23,14 @@ public final class Select {
 	private boolean isWhereClauseApplied;
 	private boolean distinctAlreadyApplied;
 	private int requestedColumnsCount;
+	private RowMapper<CMap> cMapRowMapper;
 
-	Select(JdbcTemplate jdbcTemplate, String... columns) {
+	Select(JdbcTemplate jdbcTemplate, RowMapper<CMap> rowMapper, String... columns) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.selectBuilder = new StringBuilder("SELECT ");
 		this.whereBuilder = new StringBuilder();
 		this.requestedColumnsCount = columns.length;
+		this.cMapRowMapper = rowMapper;
 		select(columns);
 	}
 
@@ -188,19 +194,22 @@ public final class Select {
 	}
 
 	// TODO: add wherePreparedStatement() - dynamic values
-	// TODO: if it if nothing returns, let it do it without throwing an exception
-
-	// when getting rows as map.. it would be convenient to have some map that supports getting value as required type
-	public Map<String, Object> asMap() {
+	// TODO: if it if nothing returns, let it do it without throwing an exception but an empty map
+	public CMap asMap() {
 		appendWhereStatements();
 		logSelect(selectBuilder);
-		return jdbcTemplate.queryForMap(selectBuilder.toString());
+		return jdbcTemplate.queryForObject(selectBuilder.toString(), cMapRowMapper);
+//		return (CMap) jdbcTemplate.queryForMap(selectBuilder.toString());
 	}
 
-	public List<Map<String, Object>> asList() {
+	// TODO: if it if nothing returns, let it do it without throwing an exception but an empty list
+	public List<CMap> asList() {
 		appendWhereStatements();
 		logSelect(selectBuilder);
-		return jdbcTemplate.queryForList(selectBuilder.toString());
+		return jdbcTemplate.queryForList(selectBuilder.toString())
+			.stream()
+			.map(CMap::new)
+			.collect(toList());
 	}
 
 	public Boolean asBoolean() {

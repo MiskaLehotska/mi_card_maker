@@ -10,6 +10,7 @@ import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
+import sk.gamehelper.helpers.CMap;
 
 public class AppRunner {
 
@@ -55,7 +56,7 @@ public class AppRunner {
 			System.out.println(new MagicItem().selectById(newId));
 			
 			// print magic item record with resolved category and rarity
-			List<Map<String, Object>> magicItems = 
+			List<CMap> magicItems = 
 				db.select("A.n_id", "A.s_title", "B.s_name AS category", "A.n_price", "C.s_acronym AS currency")
 					.from("card.t_magic_item A")
 					.leftJoin("card_enum.e_category B")
@@ -74,7 +75,7 @@ public class AppRunner {
 				.asList();
 			
 			// multiple columns ON clause
-			List<Map<String, Object>> data = db.select("A.*")
+			List<CMap> data = db.select("A.*")
 				.from("card.t_magic_item A")
 				.join("card_enum.e_coin B")
 				.on("A.n_coin_id", "B.n_id", "A.n_category_id", "B.n_id")

@@ -1,7 +1,5 @@
 package sk.gamehelper.db;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -206,10 +204,11 @@ public final class Select {
 	public List<CMap> asList() {
 		appendWhereStatements();
 		logSelect(selectBuilder);
-		return jdbcTemplate.queryForList(selectBuilder.toString())
-			.stream()
-			.map(CMap::new)
-			.collect(toList());
+		return jdbcTemplate.query(selectBuilder.toString(), cMapRowMapper);
+//		return jdbcTemplate.queryForList(selectBuilder.toString())
+//			.stream()
+//			.map(CMap::new)
+//			.collect(toList());
 	}
 
 	public Boolean asBoolean() {

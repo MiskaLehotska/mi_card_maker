@@ -1,7 +1,10 @@
 package sk.gamehelper.main;
 
+import java.awt.EventQueue;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -13,7 +16,14 @@ import sk.gamehelper.helpers.CMap;
 
 public class AppRunner {
 
-	public static void main(String[] args) {
+	public static void main(String...strings) {
+		EventQueue.invokeLater(() -> {
+			AnnotationConfigApplicationContext c = new AnnotationConfigApplicationContext(AppConfig.class);
+			c.registerShutdownHook();
+		});
+	}
+
+	public static void main(String args) {
 
 		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class)) {
 

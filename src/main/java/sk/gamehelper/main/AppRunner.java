@@ -2,7 +2,6 @@ package sk.gamehelper.main;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -50,8 +49,10 @@ public class AppRunner {
 			item.setRarityId(rarityId);
 
 			// insert item object to database and retrieve the ID of the new record
-			Long newId = item.insert();
-			
+			item.insert();
+			Long newId = item.getId();
+			System.out.println(newId);
+
 			// select magic item record by ID just retrieved from the insert operation
 			System.out.println(new MagicItem().selectById(newId));
 			

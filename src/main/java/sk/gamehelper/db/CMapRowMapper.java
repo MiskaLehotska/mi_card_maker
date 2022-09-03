@@ -19,8 +19,12 @@ public class CMapRowMapper implements RowMapper<CMap> {
 		CMap mapOfColumnValues = new CMap();
 		for (int i = 1; i < columnCount; i++) {
 			Object value = rs.getObject(i);
-			mapOfColumnValues.put(rsMeta.getColumnName(i), value);
+			mapOfColumnValues.put(removeColumnPrefix(rsMeta.getColumnName(i)), value);
 		}
 		return mapOfColumnValues;
+	}
+
+	public String removeColumnPrefix(String name) {
+		return name.substring(2);
 	}
 }

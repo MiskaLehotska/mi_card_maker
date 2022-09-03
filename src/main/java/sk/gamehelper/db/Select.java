@@ -55,7 +55,7 @@ public final class Select {
 			return this;
 		}
 		distinctAlreadyApplied = true;
-		selectBuilder.append(" DISTINCT ");
+		selectBuilder.insert(7, "DISTINCT ");
 		return this;
 	}
 

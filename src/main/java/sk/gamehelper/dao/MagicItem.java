@@ -1,5 +1,6 @@
 package sk.gamehelper.dao;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import sk.gamehelper.db.DatabaseObject;
@@ -16,7 +17,9 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 	private Integer price;
 	private Long coinId;
 	private Boolean attunement;
-	//TODO: add last three paramethers - d_from, d_to, t_write
+	private LocalDateTime from;
+	private LocalDateTime to;
+	private LocalDateTime write;
 
 	public MagicItem() {
 		this.databaseTable = "card.t_magic_item";
@@ -25,16 +28,18 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 
 	@Override
 	public MagicItem setByData(CMap data) {
-		this.id = data.getLong("n_id");
-		this.uuid = data.getUUID("u_uid_id");
-		this.title = data.getString("s_title");
-		this.description = data.getString("s_description");
-		this.categoryId = data.getLong("n_category_id");
-		this.rarityId = data.getLong("n_rarity_id");
-		this.price = data.getInteger("n_price");
-		this.coinId = data.getLong("n_coin_id");
-		this.attunement = data.getBoolean("b_attunement");
-
+		this.id = data.getLong("id");
+		this.uuid = data.getUUID("uid_id");
+		this.title = data.getString("title");
+		this.description = data.getString("description");
+		this.categoryId = data.getLong("category_id");
+		this.rarityId = data.getLong("rarity_id");
+		this.price = data.getInteger("price");
+		this.coinId = data.getLong("coin_id");
+		this.attunement = data.getBoolean("attunement");
+		this.from = data.getLocalDateTime("from");
+		this.to = data.getLocalDateTime("to");
+		this.write = data.getLocalDateTime("write");
 		return this;
 	}
 
@@ -50,7 +55,9 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 		map.put("n_price", this.price);
 		map.put("n_coin_id", this.coinId);
 		map.put("b_attunement", this.attunement);
-
+		map.put("d_from", this.from);
+		map.put("d_to", this.to);
+		map.put("t_write", this.write);
 		return map;
 	}
 
@@ -124,6 +131,30 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 
 	public void setAttunement(Boolean attunement) {
 		this.attunement = attunement;
+	}
+
+	public LocalDateTime getFrom() {
+		return from;
+	}
+
+	public void setFrom(LocalDateTime from) {
+		this.from = from;
+	}
+
+	public LocalDateTime getTo() {
+		return to;
+	}
+
+	public void setTo(LocalDateTime to) {
+		this.to = to;
+	}
+
+	public LocalDateTime getWrite() {
+		return write;
+	}
+
+	public void setWrite(LocalDateTime write) {
+		this.write = write;
 	}
 
 	@Override

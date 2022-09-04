@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import java.awt.Color;
 
 public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFeMessageStones;
@@ -25,6 +26,7 @@ public class MagicItemCreatePanel extends JPanel {
 		setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("MAGIC ITEM NAME");
+		lblNewLabel.setForeground(new Color(238, 238, 236));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setBounds(172, 12, 214, 37);
 		add(lblNewLabel);
@@ -37,18 +39,22 @@ public class MagicItemCreatePanel extends JPanel {
 		txtFeMessageStones.setColumns(10);
 		
 		JLabel lblCategory = new JLabel("CATEGORY");
+		lblCategory.setForeground(new Color(238, 238, 236));
 		lblCategory.setBounds(50, 133, 99, 15);
 		add(lblCategory);
 		
 		JLabel lblRarity = new JLabel("RARITY");
+		lblRarity.setForeground(new Color(238, 238, 236));
 		lblRarity.setBounds(50, 170, 70, 15);
 		add(lblRarity);
 		
 		JLabel lblPrice = new JLabel("PRICE");
+		lblPrice.setForeground(new Color(238, 238, 236));
 		lblPrice.setBounds(287, 170, 70, 15);
 		add(lblPrice);
 		
 		JLabel lblDescription = new JLabel("DESCRIPTION");
+		lblDescription.setForeground(new Color(238, 238, 236));
 		lblDescription.setBounds(51, 218, 121, 15);
 		add(lblDescription);
 		
@@ -91,6 +97,7 @@ public class MagicItemCreatePanel extends JPanel {
 		add(comboBox_2);
 		
 		JLabel lblRequiresAttunement = new JLabel("REQ. ATTUNEMENT ?");
+		lblRequiresAttunement.setForeground(new Color(238, 238, 236));
 		lblRequiresAttunement.setBounds(287, 133, 156, 15);
 		add(lblRequiresAttunement);
 		

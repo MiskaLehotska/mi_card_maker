@@ -22,19 +22,19 @@ public class AppRunner {
 
 			// give me coin id by coin acronym (gp)
 			Long coinId = db.select("n_id")
-				.from("card_enum.e_coin")
+				.from("e_coin")
 				.where("s_acronym", QueryOperator.LIKE, "g")
 				.asLong();
 
 			// give me category id 1
 			Long categoryId = db.select("n_id")
-				.from("card_enum.e_category")
+				.from("e_category")
 				.where("n_id", QueryOperator.LESS_THAN, 2)
 				.asLong();
 			
 			// give me rarity id by rarity name (Uncommon)
 			Long rarityId = db.select("n_id")
-				.from("card_enum.e_rarity")
+				.from("e_rarity")
 				.where("s_name", "Uncommon") // QueryOperator.EQUALS je default
 				.asLong();
 
@@ -59,10 +59,11 @@ public class AppRunner {
 			// print magic item record with resolved category and rarity
 			List<CMap> magicItems = 
 				db.select("A.n_id", "A.s_title", "B.s_name AS category", "A.n_price", "C.s_acronym AS currency")
-					.from("card.t_magic_item A")
-					.leftJoin("card_enum.e_category B")
+					.distinct()
+					.from("t_magic_item A")
+					.leftJoin("e_category B")
 					.on("A.n_category_id", "B.n_id")
-					.join("card_enum.e_coin C")
+					.join("e_coin C")
 					.on("A.n_coin_id", "C.n_id")
 					.where("A.n_id", QueryOperator.LESS_THAN, 3)
 					.asList();
@@ -71,14 +72,14 @@ public class AppRunner {
 
 			// select magic items where its id is one of 3, 4, or 7
 			magicItems = db.select()
-				.from("card.t_magic_item")
+				.from("t_magic_item")
 				.whereIn("n_id", Arrays.asList(3, 4, 7))
 				.asList();
 			
 			// multiple columns ON clause
 			List<CMap> data = db.select("A.*")
-				.from("card.t_magic_item A")
-				.join("card_enum.e_coin B")
+				.from("t_magic_item A")
+				.join("e_coin B")
 				.on("A.n_coin_id", "B.n_id", "A.n_category_id", "B.n_id")
 				.asList();
 

@@ -22,7 +22,7 @@ public class MagicItem extends DatabaseObject<MagicItem> {
 	private LocalDateTime write;
 
 	public MagicItem() {
-		this.databaseTable = "card.t_magic_item";
+		this.databaseTable = "t_magic_item";
 		this.identifier = "n_id";
 	}
 

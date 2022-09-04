@@ -1,8 +1,10 @@
 package sk.gamehelper.ui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -12,17 +14,31 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import java.awt.Color;
+
+import sk.gamehelper.config.AccessibleContext;
+import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.services.EnumService;
 
 public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFeMessageStones;
 	private JTextField txtFe;
 	private Image image;
+
+	private List<CMap> categoryEnum;
+	private List<CMap> rarityEnum;
+	private List<CMap> coinEnum;
+
 	/**
 	 * Create the panel.
 	 */
 	public MagicItemCreatePanel(Image image) {
+		EnumService enumService = AccessibleContext.getBean(EnumService.class);
+		categoryEnum = enumService.getCategoryEnum();
+		rarityEnum = enumService.getRarityEnum();
+		coinEnum = enumService.getCoinEnum();
+
 		this.image = image;
+
 		setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("MAGIC ITEM NAME");
@@ -65,26 +81,16 @@ public class MagicItemCreatePanel extends JPanel {
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		add(textArea);
-		
-		JButton btnCreate = new JButton("CREATE");
-		btnCreate.setBounds(61, 598, 88, 25);
-		add(btnCreate);
-		
-		JButton btnExport = new JButton("EXPORT");
-		btnExport.setBounds(240, 598, 88, 25);
-		add(btnExport);
-		
-		JButton btnReset = new JButton("RESET");
-		btnReset.setBounds(410, 598, 88, 25);
-		add(btnReset);
-		
+
 		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Armor", "Staff", "Weapon", "Scroll"}));
+		Object[] categoryOptions = categoryEnum.stream().map(c -> c.getString("name")).toArray();
+		comboBox.setModel(new DefaultComboBoxModel(categoryOptions));
 		comboBox.setBounds(137, 128, 121, 24);
 		add(comboBox);
-		
+
 		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"Common", "Uncommon", "Rare", "Very rare", "Legendary"}));
+		Object[] rarityOptions = rarityEnum.stream().map(c -> c.getString("name")).toArray();
+		comboBox_1.setModel(new DefaultComboBoxModel(rarityOptions));
 		comboBox_1.setBounds(137, 165, 121, 24);
 		add(comboBox_1);
 		
@@ -95,7 +101,8 @@ public class MagicItemCreatePanel extends JPanel {
 		txtFe.setColumns(10);
 		
 		JComboBox comboBox_2 = new JComboBox();
-		comboBox_2.setModel(new DefaultComboBoxModel(new String[] {"Gold", "Silver", "Platinum", "Copper", "Electrum"}));
+		Object[] coinOptions = coinEnum.stream().map(c -> c.getString("name")).toArray();
+		comboBox_2.setModel(new DefaultComboBoxModel(coinOptions));
 		comboBox_2.setBounds(410, 165, 100, 24);
 		add(comboBox_2);
 		
@@ -108,6 +115,57 @@ public class MagicItemCreatePanel extends JPanel {
 		comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"No", "Yes"}));
 		comboBox_3.setBounds(448, 128, 63, 25);
 		add(comboBox_3);
+
+		JButton btnCreate = new JButton("CREATE");
+		btnCreate.setBounds(61, 598, 88, 25);
+		btnCreate.addActionListener(al -> {
+			// validate text fields
+
+			// gather values, resolve and prepare insert data
+			CMap data = new CMap(
+
+				"title", txtFeMessageStones.getText(),
+				"description", textArea.getText(),
+				"attunement", "Yes".equals(comboBox_3.getSelectedItem()) ? true : false,
+				"price", Double.valueOf(txtFe.getText()).intValue(),
+
+				"category_id", categoryEnum.stream()
+					.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
+					.map(e -> e.getLong("id"))
+					.findFirst().get(),
+
+				"rarity_id", rarityEnum.stream()
+					.filter(e -> e.getString("name").equals(comboBox_1.getSelectedItem()))
+					.map(e -> e.getLong("id"))
+					.findFirst().get(),
+
+				"coin_id", coinEnum.stream()
+					.filter(e -> e.getString("name").equals(comboBox_2.getSelectedItem()))
+					.map(e -> e.getLong("id"))
+					.findFirst().get());
+
+			// check data
+			System.out.println(data);
+		});
+		add(btnCreate);
+
+		JButton btnExport = new JButton("EXPORT");
+		btnExport.setBounds(240, 598, 88, 25);
+		add(btnExport);
+
+		JButton btnReset = new JButton("RESET");
+		btnReset.setBounds(410, 598, 88, 25);
+		btnReset.addActionListener(al -> {
+			// clear all the fields and reset options
+			txtFeMessageStones.setText("");
+			txtFe.setText("");
+			textArea.setText("");
+			comboBox.setSelectedIndex(0);
+			comboBox_1.setSelectedIndex(0);
+			comboBox_2.setSelectedIndex(0);
+			comboBox_3.setSelectedIndex(0);
+		});
+		add(btnReset);
 
 	}
 

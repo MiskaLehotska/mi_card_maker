@@ -17,7 +17,7 @@ public class MainUI {
 			f.setLocationRelativeTo(null);
 			f.add(new MagicItemCreatePanel(
 					ImageIO.read(
-			MainUI.class.getClassLoader().getResourceAsStream("images/background_images/Sentimental-1.jpg"))));
+			MainUI.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg"))));
 			f.setVisible(true);
 			} catch(IOException e) {
 				e.printStackTrace();

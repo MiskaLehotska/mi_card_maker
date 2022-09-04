@@ -107,11 +107,11 @@ public class MagicItemCreatePanel extends JPanel {
 		add(comboBox_3);
 
 	}
-	
+
 	@Override
 	  protected void paintComponent(Graphics g) {
 
 	    super.paintComponent(g);
-	       g.drawImage(image, 0, 0, null);
+	       g.drawImage(image, -20, 0, null);
 	}
 }

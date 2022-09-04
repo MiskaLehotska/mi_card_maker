@@ -32,10 +32,11 @@ public final class Select {
 		this.whereBuilder = new StringBuilder();
 		this.requestedColumnsCount = columns.length;
 		this.cMapRowMapper = rowMapper;
+		this.direction = OrderByDirection.ASC;
 		select(columns);
 	}
 
-	// toto mi vobec nepomoze pri Join triede
+	// TODO: test this
 	public Select(Select otherSelect) {
 		this.jdbcTemplate = otherSelect.jdbcTemplate;
 		this.selectBuilder = new StringBuilder(otherSelect.selectBuilder);
@@ -265,8 +266,14 @@ public final class Select {
 
 	private void appendRemainingParts() {
 		appendWhereStatements();
-		appendOrderBy();
-		appendLimit();
+
+		if (orderByColumn != null) {
+			appendOrderBy();
+		}
+
+		if (limit > 0) {
+			appendLimit();
+		}
 	}
 
 	private void appendWhereStatements() {
@@ -280,10 +287,8 @@ public final class Select {
 	}
 
 	private void appendLimit() {
-		if (limit > 0) {
-			selectBuilder.append(" LIMIT ");
-			selectBuilder.append(limit);
-		}
+		selectBuilder.append(" LIMIT ");
+		selectBuilder.append(limit);
 	}
 
 	private <T> T queryForObject(Class<T> classObj) {
@@ -299,9 +304,10 @@ public final class Select {
 	private static void logSelect(CharSequence select) {
 		logger.info("executing: " + select);
 	}
-	
+
 	@Override
 	public String toString() {
-		return this.selectBuilder.append(this.whereBuilder).toString();
+		appendRemainingParts();
+		return this.selectBuilder.toString();
 	}
 }

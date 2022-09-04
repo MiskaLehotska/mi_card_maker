@@ -1,19 +1,21 @@
 package sk.gamehelper.db;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import sk.gamehelper.config.AccessibleContext;
+import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
 
 public abstract class DatabaseObject<T> {
+
+	private static final Logger logger = Logger.getAnonymousLogger();
+
+	private static final String INFINITY = Timestamp.valueOf(LocalDateTime.of(9999, 12, 31, 11, 59, 59)).toString();
 
 	protected String databaseTable;
 	protected String identifier;
@@ -35,14 +37,15 @@ public abstract class DatabaseObject<T> {
 
 	public void insert() {
 		String write = Timestamp.valueOf(LocalDateTime.now()).toString();
-		jdbcTemplate.update(constructInsertStatement(write));
+		String insertStatement = constructInsertStatement(write);
+		logger.info(insertStatement);
+		jdbcTemplate.update(insertStatement);
 
-		// TODO: figure out how to get last valid record and directly set it into the model
-		setByData(
-		database.select()
+		// get this record from db and set generated fields
+		setByData(database.select()
 			.from(databaseTable)
-			.where("t_write", write)
-//			.limit(1)
+			.orderBy("n_id", OrderByDirection.DESC)
+			.limit(1)
 			.asMap());
 	}
 
@@ -50,7 +53,7 @@ public abstract class DatabaseObject<T> {
 		CMap data = getAsDbRow();
 		data.remove(identifier);
 		data.remove("u_uid_id");
-		data.put("d_to", "infinity");
+		data.put("d_to", INFINITY);
 		data.put("d_from", write);
 		data.put("t_write", write);
 
@@ -83,7 +86,6 @@ public abstract class DatabaseObject<T> {
 				.toString();
 	}
 
-	
 	protected abstract T setByData(CMap data);
 
 	protected abstract CMap getAsDbRow();

@@ -9,6 +9,7 @@ import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
+import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
 
 public class AppRunner {
@@ -84,6 +85,14 @@ public class AppRunner {
 				.asList();
 
 			System.out.println(data.size());
+
+			// order by and limit test - order by supports integers or strings
+			System.out.println(db.select()
+					.from("e_rarity")
+					.where("n_id", QueryOperator.LESS_THAN, 100)
+					.orderBy(1, OrderByDirection.DESC)
+					.limit(3)
+					.asList());
 		}
 	}
 }

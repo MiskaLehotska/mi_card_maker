@@ -21,6 +21,9 @@ public final class Select {
 	private boolean isWhereClauseApplied;
 	private boolean distinctAlreadyApplied;
 	private int requestedColumnsCount;
+	private int limit;
+	private Object orderByColumn;
+	private OrderByDirection direction;
 	private RowMapper<CMap> cMapRowMapper;
 
 	Select(JdbcTemplate jdbcTemplate, RowMapper<CMap> rowMapper, String... columns) {
@@ -191,10 +194,41 @@ public final class Select {
 		}
 	}
 
+	public Select limit(int howMany) {
+		this.limit = howMany;
+		return this;
+	}
+	
+	public enum OrderByDirection {
+		ASC(" ASC"),
+		DESC(" DESC");
+
+		private String direction;
+
+		private OrderByDirection(String direction) {
+			this.direction = direction;
+		}
+
+		public String getDirection() {
+			return this.direction;
+		}
+	}
+
+	public Select orderBy(Object column) {
+		return orderBy(column, OrderByDirection.ASC);
+	}
+
+	// TODO: validate object column type against string or integer
+	public Select orderBy(Object column, OrderByDirection direction) {
+		this.orderByColumn = column;
+		this.direction = direction;
+		return this;
+	}
+
 	// TODO: add wherePreparedStatement() - dynamic values
 	// TODO: if it if nothing returns, let it do it without throwing an exception but an empty map
 	public CMap asMap() {
-		appendWhereStatements();
+		appendRemainingParts();
 		logSelect(selectBuilder);
 		return jdbcTemplate.queryForObject(selectBuilder.toString(), cMapRowMapper);
 //		return (CMap) jdbcTemplate.queryForMap(selectBuilder.toString());
@@ -202,7 +236,7 @@ public final class Select {
 
 	// TODO: if it if nothing returns, let it do it without throwing an exception but an empty list
 	public List<CMap> asList() {
-		appendWhereStatements();
+		appendRemainingParts();
 		logSelect(selectBuilder);
 		return jdbcTemplate.query(selectBuilder.toString(), cMapRowMapper);
 //		return jdbcTemplate.queryForList(selectBuilder.toString())
@@ -212,25 +246,44 @@ public final class Select {
 	}
 
 	public Boolean asBoolean() {
-		appendWhereStatements();
+		appendRemainingParts();
 		logSelect(selectBuilder);
 		return queryForObject(Boolean.class);
 	}
 
 	public Long asLong() {
-		appendWhereStatements();
+		appendRemainingParts();
 		logSelect(selectBuilder);
 		return queryForObject(Long.class);
 	}
 
 	public String asString() {
-		appendWhereStatements();
+		appendRemainingParts();
 		logSelect(selectBuilder);
 		return queryForObject(String.class);
 	}
 
+	private void appendRemainingParts() {
+		appendWhereStatements();
+		appendOrderBy();
+		appendLimit();
+	}
+
 	private void appendWhereStatements() {
-		this.selectBuilder.append(whereBuilder);
+		selectBuilder.append(whereBuilder);
+	}
+
+	private void appendOrderBy() {
+		selectBuilder.append(" ORDER BY ");
+		selectBuilder.append(orderByColumn);
+		selectBuilder.append(direction.getDirection());
+	}
+
+	private void appendLimit() {
+		if (limit > 0) {
+			selectBuilder.append(" LIMIT ");
+			selectBuilder.append(limit);
+		}
 	}
 
 	private <T> T queryForObject(Class<T> classObj) {

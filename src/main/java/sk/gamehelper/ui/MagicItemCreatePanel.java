@@ -112,6 +112,7 @@ public class MagicItemCreatePanel extends JPanel {
 	  protected void paintComponent(Graphics g) {
 
 	    super.paintComponent(g);
-	       g.drawImage(image, -20, 0, null);
+	    // image, x-os, y-os
+	       g.drawImage(image, -20, -52, null);
 	}
 }

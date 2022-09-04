@@ -1,25 +1,27 @@
 package sk.gamehelper.ui;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JToggleButton;
-import javax.swing.JCheckBox;
-import javax.swing.JTextArea;
-import javax.swing.JButton;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFeMessageStones;
 	private JTextField txtFe;
-
+	private Image image;
 	/**
 	 * Create the panel.
 	 */
-	public MagicItemCreatePanel() {
+	public MagicItemCreatePanel(Image image) {
+		this.image = image;
 		setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("MAGIC ITEM NAME");
@@ -97,5 +99,12 @@ public class MagicItemCreatePanel extends JPanel {
 		comboBox_3.setBounds(448, 128, 63, 25);
 		add(comboBox_3);
 
+	}
+	
+	@Override
+	  protected void paintComponent(Graphics g) {
+
+	    super.paintComponent(g);
+	       g.drawImage(image, 0, 0, null);
 	}
 }

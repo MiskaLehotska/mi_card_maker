@@ -24,18 +24,19 @@ public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFe;
 	private Image image;
 
-	private List<CMap> categoryEnum;
-	private List<CMap> rarityEnum;
-	private List<CMap> coinEnum;
+	private static List<CMap> categoryEnum;
+	private static List<CMap> rarityEnum;
+	private static List<CMap> coinEnum;
+
+	// init enums into the cache
+	static {
+		loadEnums();
+	}
 
 	/**
 	 * Create the panel.
 	 */
-	public MagicItemCreatePanel(Image image) {
-		EnumService enumService = AccessibleContext.getBean(EnumService.class);
-		categoryEnum = enumService.getCategoryEnum();
-		rarityEnum = enumService.getRarityEnum();
-		coinEnum = enumService.getCoinEnum();
+	public MagicItemCreatePanel(Image image) {		
 
 		this.image = image;
 
@@ -97,6 +98,7 @@ public class MagicItemCreatePanel extends JPanel {
 		txtFe = new JTextField();
 		txtFe.setFont(new Font("Dialog", Font.PLAIN, 14));
 		txtFe.setBounds(336, 165, 70, 25);
+		txtFe.setHorizontalAlignment(JTextField.RIGHT);
 		add(txtFe);
 		txtFe.setColumns(10);
 		
@@ -175,5 +177,12 @@ public class MagicItemCreatePanel extends JPanel {
 	    super.paintComponent(g);
 	    // image, x-os, y-os
 	       g.drawImage(image, -20, -52, null);
+	}
+
+	private static void loadEnums() {
+		EnumService enumService = AccessibleContext.getBean(EnumService.class);
+		categoryEnum = enumService.getCategoryEnum();
+		rarityEnum = enumService.getRarityEnum();
+		coinEnum = enumService.getCoinEnum();
 	}
 }

@@ -35,6 +35,7 @@ public class MagicItemCreatePanel extends JPanel {
 		txtFeMessageStones.setHorizontalAlignment(SwingConstants.CENTER);
 		txtFeMessageStones.setFont(new Font("Dialog", Font.PLAIN, 14));
 		txtFeMessageStones.setBounds(50, 56, 460, 37);
+//		txtFeMessageStones.setOpaque(false);
 		add(txtFeMessageStones);
 		txtFeMessageStones.setColumns(10);
 		
@@ -61,6 +62,8 @@ public class MagicItemCreatePanel extends JPanel {
 		JTextArea textArea = new JTextArea();
 		textArea.setBounds(46, 245, 464, 331);
 		textArea.setFont(new Font("Dialog", Font.PLAIN, 14));
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
 		add(textArea);
 		
 		JButton btnCreate = new JButton("CREATE");

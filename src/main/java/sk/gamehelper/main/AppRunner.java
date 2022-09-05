@@ -11,6 +11,7 @@ import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
 import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.QueryParams;
 
 public class AppRunner {
 
@@ -88,11 +89,27 @@ public class AppRunner {
 
 			// order by and limit test - order by supports integers or strings
 			System.out.println(db.select()
-					.from("e_rarity")
-					.where("n_id", QueryOperator.LESS_THAN, 100)
-					.orderBy(1, OrderByDirection.DESC)
-					.limit(3)
-					.asList());
+				.from("e_rarity")
+				.where("n_id", QueryOperator.LESS_THAN, 100)
+				.orderBy(1, OrderByDirection.DESC)
+				.limit(3)
+				.asList());
+			
+			// using queryParams
+			QueryParams queryParams = new QueryParams();
+			queryParams.addParam("rarity_id", 2);
+			queryParams.addParam("coin_id", 2);
+
+			queryParams.removeParam("coin_id");
+
+			CMap miData = db.select()
+				.from("t_magic_item")
+				.where(queryParams)
+				.limit(1)
+				.asMap();
+			
+			MagicItem magicItem = new MagicItem().setByData(miData);
+			System.out.println(magicItem);
 		}
 	}
 }

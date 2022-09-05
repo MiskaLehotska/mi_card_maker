@@ -1,6 +1,7 @@
 package sk.gamehelper.db;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.QueryParams;
 
 // TODO: add documentation with hints
 public final class Select {
@@ -25,6 +27,7 @@ public final class Select {
 	private Object orderByColumn;
 	private OrderByDirection direction;
 	private RowMapper<CMap> cMapRowMapper;
+	private FieldTranslator fieldTranslator;
 
 	Select(JdbcTemplate jdbcTemplate, RowMapper<CMap> rowMapper, String... columns) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -33,6 +36,7 @@ public final class Select {
 		this.requestedColumnsCount = columns.length;
 		this.cMapRowMapper = rowMapper;
 		this.direction = OrderByDirection.ASC;
+		this.fieldTranslator = new FieldTranslator();
 		select(columns);
 	}
 
@@ -95,6 +99,18 @@ public final class Select {
 		appendWhereClauseConnector();
 		whereBuilder.append(column);
 		whereBuilder.append(queryOperator.applyOperationOnValue(value));
+		return this;
+	}
+
+	public Select where(QueryParams queryParams) {
+		String field;
+		Object value;
+		for (Map.Entry<String, Object> entry : queryParams.getQueryEntries()) {
+			value = entry.getValue();
+			field = fieldTranslator.getFieldPrefixByValueType(value).concat(entry.getKey());
+
+			where(field, value);
+		}
 		return this;
 	}
 

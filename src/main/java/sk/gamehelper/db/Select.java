@@ -131,7 +131,11 @@ public final class Select {
 
 		Stream<String> valuesJoiningStream = values.stream().map(String::valueOf);
 		if (values.get(0) instanceof CharSequence) {
-			valuesJoiningStream = valuesJoiningStream.map(val -> "'".concat(val).concat("'"));
+			valuesJoiningStream = valuesJoiningStream
+					.map(val -> val.replace('\n', ' '))
+					.map(val -> val.replace("'", "\'"))
+					.map(val -> val.replace('"', '\''))
+					.map(val -> "\"".concat(val).concat("\""));
 		}
 		whereBuilder.append(valuesJoiningStream.collect(Collectors.joining(",")));
 		whereBuilder.append(")");

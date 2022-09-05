@@ -70,7 +70,12 @@ public abstract class DatabaseObject<T> {
 
 			Object value = entry.getValue();
 			if (value instanceof CharSequence) {
-				value = "'" + value + "'";
+				value = value.toString()
+					.replace('\n', ' ')
+					.replace("'", "\'")
+					.replace('"', '\'');
+
+				value = "\"" + value + "\"";
 			}
 			values.append(value);
 			values.append(",");

@@ -18,11 +18,13 @@ import javax.swing.SwingConstants;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
+import sk.gamehelper.services.MagicItemService;
 
 public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFeMessageStones;
 	private JTextField txtFe;
 	private Image image;
+	private MagicItemService magicItemService;
 
 	private static List<CMap> categoryEnum;
 	private static List<CMap> rarityEnum;
@@ -37,7 +39,7 @@ public class MagicItemCreatePanel extends JPanel {
 	 * Create the panel.
 	 */
 	public MagicItemCreatePanel(Image image) {		
-
+		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 		this.image = image;
 
 		setLayout(null);
@@ -148,6 +150,7 @@ public class MagicItemCreatePanel extends JPanel {
 
 			// check data
 			System.out.println(data);
+			magicItemService.createMagicItem(data);
 		});
 		add(btnCreate);
 

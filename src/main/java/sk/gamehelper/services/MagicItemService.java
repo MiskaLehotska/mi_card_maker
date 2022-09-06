@@ -31,9 +31,9 @@ public class MagicItemService {
 	private void validateTitle(MagicItem item) {
 		String title = item.getTitle();
 		List<CMap> itemsWithSameTitle = db.select("s_title")
-				.from(Table.MAGIC_ITEM)
-				.where("s_title", title)
-				.asList();
+			.from(Table.MAGIC_ITEM)
+			.where("s_title", title)
+			.asList();
 
 		if (!itemsWithSameTitle.isEmpty()) {
 			throw new RecordAlreadyExists(MessagesLoader.resolveMessage("magicItemTitleValidation", title));

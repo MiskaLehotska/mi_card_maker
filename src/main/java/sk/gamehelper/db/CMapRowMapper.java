@@ -23,7 +23,7 @@ public class CMapRowMapper implements RowMapper<CMap> {
 		ResultSetMetaData rsMeta = rs.getMetaData();
 		int columnCount = rsMeta.getColumnCount();
 		CMap mapOfColumnValues = new CMap();
-		for (int i = 1; i < columnCount; i++) {
+		for (int i = 1; i <= columnCount; i++) {
 			Object value = rs.getObject(i);
 			String name = translator.removeColumnPrefix(rsMeta.getColumnName(i));
 			mapOfColumnValues.put(name, value);

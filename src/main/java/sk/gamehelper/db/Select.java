@@ -27,7 +27,7 @@ public final class Select {
 	private Object orderByColumn;
 	private OrderByDirection direction;
 	private RowMapper<CMap> cMapRowMapper;
-	private FieldTranslator fieldTranslator;
+	private ColumnNameTranslator fieldTranslator;
 
 	Select(JdbcTemplate jdbcTemplate, RowMapper<CMap> rowMapper, String... columns) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -36,7 +36,7 @@ public final class Select {
 		this.requestedColumnsCount = columns.length;
 		this.cMapRowMapper = rowMapper;
 		this.direction = OrderByDirection.ASC;
-		this.fieldTranslator = new FieldTranslator();
+		this.fieldTranslator = new ColumnNameTranslator();
 		select(columns);
 	}
 
@@ -107,7 +107,7 @@ public final class Select {
 		Object value;
 		for (Map.Entry<String, Object> entry : queryParams.getQueryEntries()) {
 			value = entry.getValue();
-			field = fieldTranslator.getFieldPrefixByValueType(value).concat(entry.getKey());
+			field = fieldTranslator.translateToColumnName(entry.getKey(), value);
 
 			where(field, value);
 		}

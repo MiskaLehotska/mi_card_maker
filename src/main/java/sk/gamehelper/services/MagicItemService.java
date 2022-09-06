@@ -2,20 +2,22 @@ package sk.gamehelper.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.Table;
-import sk.gamehelper.exceptions.ExistingMagicItemTitleException;
+import sk.gamehelper.exceptions.RecordAlreadyExists;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.MessagesLoader;
 
 @Component
 public class MagicItemService {
 
-	Database db = AccessibleContext.getBean(Database.class);
+	@Autowired
+	private Database db;
 
 	@Transactional
 	public void createMagicItem(CMap data) {
@@ -33,11 +35,8 @@ public class MagicItemService {
 				.where("s_title", title)
 				.asList();
 
-		if (itemsWithSameTitle.isEmpty()) {
-			item.insert();
-		} else {
-			throw new ExistingMagicItemTitleException();
+		if (!itemsWithSameTitle.isEmpty()) {
+			throw new RecordAlreadyExists(MessagesLoader.resolveMessage("magicItemTitleValidation", title));
 		}
 	}
-
 }

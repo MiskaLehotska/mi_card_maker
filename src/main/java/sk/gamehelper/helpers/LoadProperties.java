@@ -22,10 +22,7 @@ public class LoadProperties {
 		}
 	}
 	
-	
-	
-	
-	
+
 	public static String resolveMessage(String propertyName, Object ...objects) {
 		String resolvedPropertyName = property.getProperty(propertyName);
 		for(Object object: objects) {

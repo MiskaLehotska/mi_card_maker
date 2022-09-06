@@ -24,6 +24,8 @@ public class MagicItemCreatePanel extends JPanel {
 	private JTextField txtFeMessageStones;
 	private JTextField txtFe;
 	private Image image;
+
+	private FieldValidator validator;
 	private MagicItemService magicItemService;
 
 	private static List<CMap> categoryEnum;
@@ -41,9 +43,10 @@ public class MagicItemCreatePanel extends JPanel {
 	public MagicItemCreatePanel(Image image) {		
 		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 		this.image = image;
+		this.validator = new FieldValidator();
 
 		setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("MAGIC ITEM NAME");
 		lblNewLabel.setForeground(new Color(238, 238, 236));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -124,6 +127,7 @@ public class MagicItemCreatePanel extends JPanel {
 		btnCreate.setBounds(61, 598, 88, 25);
 		btnCreate.addActionListener(al -> {
 			// validate text fields
+			validator.validateRequiredFields(txtFeMessageStones, txtFe, textArea);
 
 			// gather values, resolve and prepare insert data
 			CMap data = new CMap(
@@ -150,7 +154,12 @@ public class MagicItemCreatePanel extends JPanel {
 
 			// check data
 			System.out.println(data);
-			magicItemService.createMagicItem(data);
+
+			try {
+				magicItemService.createMagicItem(data);
+			} catch (RuntimeException e) {
+				// if insert doesnt go well
+			}
 		});
 		add(btnCreate);
 

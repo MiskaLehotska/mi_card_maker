@@ -12,7 +12,7 @@ import sk.gamehelper.exceptions.RequiredFieldValidationError;
 
 public class FieldValidator {
 
-	private static final String REQUIRED_FIELDS_EMPTY_MESSAGE = " fields are required and they cannot be empty!";
+	private static final String REQUIRED_FIELDS_EMPTY_MESSAGE = "These fields are required: ";
 	private static final String FIELD_TYPE_MISMATCH_MESSAGE = " field does not have required type of value!";
 	private static final String FIELD_CONTENT_TOO_LARGE = " field content is too large, max allowed length is ";
 
@@ -27,7 +27,7 @@ public class FieldValidator {
 			}
 		}
 		if (!fieldNames.isEmpty()) {
-			throw new RequiredFieldValidationError(fieldNames + REQUIRED_FIELDS_EMPTY_MESSAGE);
+			throw new RequiredFieldValidationError(REQUIRED_FIELDS_EMPTY_MESSAGE + fieldNames);
 		}
 	}
 

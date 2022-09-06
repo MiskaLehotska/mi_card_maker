@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -192,8 +193,11 @@ public class MagicItemCreatePanel extends JPanel {
 
 		try {
 			magicItemService.createMagicItem(data);
+			JOptionPane.showMessageDialog(this, "A new Magic Item \"" + data.getString("title") 
+			+ "\" has been created!", "Magic item created", JOptionPane.INFORMATION_MESSAGE);
 		} catch (RuntimeException e) {
-			// create dialog
+			JOptionPane.showMessageDialog(this, e.getMessage(), 
+				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

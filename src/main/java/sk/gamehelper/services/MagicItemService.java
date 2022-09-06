@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
-import sk.gamehelper.db.Tables;
+import sk.gamehelper.db.Table;
 import sk.gamehelper.exceptions.ExistingMagicItemTitleException;
 import sk.gamehelper.helpers.CMap;
 
@@ -29,7 +29,7 @@ public class MagicItemService {
 	private void validateTitle(MagicItem item) {
 		String title = item.getTitle();
 		List<CMap> itemsWithSameTitle = db.select("s_title")
-				.from(Tables.MAGIC_ITEM_ENUM)
+				.from(Table.MAGIC_ITEM)
 				.where("s_title", title)
 				.asList();
 

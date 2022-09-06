@@ -1,11 +1,14 @@
 package sk.gamehelper.db;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -251,19 +254,28 @@ public final class Select {
 	public CMap asMap() {
 		appendRemainingParts();
 		logSelect(selectBuilder);
-		return jdbcTemplate.queryForObject(selectBuilder.toString(), cMapRowMapper);
-//		return (CMap) jdbcTemplate.queryForMap(selectBuilder.toString());
+
+		try {
+			return jdbcTemplate.queryForObject(selectBuilder.toString(), cMapRowMapper);
+		} catch (EmptyResultDataAccessException emptyResult) {
+			return new CMap();
+		}
 	}
 
 	// TODO: if it if nothing returns, let it do it without throwing an exception but an empty list
 	public List<CMap> asList() {
 		appendRemainingParts();
 		logSelect(selectBuilder);
-		return jdbcTemplate.query(selectBuilder.toString(), cMapRowMapper);
-//		return jdbcTemplate.queryForList(selectBuilder.toString())
-//			.stream()
-//			.map(CMap::new)
-//			.collect(toList());
+
+		try {
+			return jdbcTemplate.query(selectBuilder.toString(), cMapRowMapper);
+//			return jdbcTemplate.queryForList(selectBuilder.toString())
+//				.stream()
+//				.map(CMap::new)
+//				.collect(toList());
+		} catch (DataAccessException dae) {
+			return Collections.emptyList();
+		}
 	}
 
 	public Boolean asBoolean() {
@@ -318,7 +330,11 @@ public final class Select {
 				+ " select clause to directly ask for its value in this manner.");
 		}
 //		return jdbcTemplate.queryForObject(sql, rowMapper); // could use for StringMap with values converted
-		return jdbcTemplate.queryForObject(selectBuilder.toString(), classObj);
+		try {
+			return jdbcTemplate.queryForObject(selectBuilder.toString(), classObj);
+		} catch (EmptyResultDataAccessException dae) {
+			return null;
+		}
 	}
 
 	private static void logSelect(CharSequence select) {

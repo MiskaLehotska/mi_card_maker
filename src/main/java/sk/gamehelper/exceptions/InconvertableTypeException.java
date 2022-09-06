@@ -1,4 +1,4 @@
-package sk.gamehelper.helpers;
+package sk.gamehelper.exceptions;
 
 public class InconvertableTypeException extends RuntimeException{
 	

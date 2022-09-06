@@ -5,5 +5,6 @@ public class Tables {
 	public static final String COIN_ENUM = "e_coin";
 	public static final String RARITY_ENUM = "e_rarity";
 	public static final String CATEGORY_ENUM = "e_category";
+	public static final String MAGIC_ITEM_ENUM = "t_magic_item";
 
 }

@@ -1,12 +1,19 @@
 package sk.gamehelper.ui;
 
+import static sk.gamehelper.ui.SimpleComponentCreator.createBasicButton;
+import static sk.gamehelper.ui.SimpleComponentCreator.createBasicComboBox;
+import static sk.gamehelper.ui.SimpleComponentCreator.createBasicLabel;
+import static sk.gamehelper.ui.SimpleComponentCreator.createBasicTextArea;
+import static sk.gamehelper.ui.SimpleComponentCreator.createBasicTextField;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -21,16 +28,35 @@ import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
 
 public class MagicItemCreatePanel extends JPanel {
-	private JTextField txtFeMessageStones;
-	private JTextField txtFe;
-	private Image image;
 
-	private FieldValidator validator;
-	private MagicItemService magicItemService;
+	private static final long serialVersionUID = 7797469423579293767L;
+	private static final Color WHITE = new Color(238, 238, 236);
+	private static final Font DIALOG_PLAIN_14 = new Font("Dialog", Font.PLAIN, 14);
 
 	private static List<CMap> categoryEnum;
 	private static List<CMap> rarityEnum;
 	private static List<CMap> coinEnum;
+
+	private MagicItemService magicItemService;
+	private FieldValidator validator;
+	private JLabel titleLabel;
+	private JLabel categoryLabel;
+	private JLabel rarityLabel;
+	private JLabel priceLabel;
+	private JLabel descriptionLabel;
+	private JLabel attunementLabel;
+	private JTextField titleField;
+	private JTextField priceField;
+	private JTextArea descriptionArea;
+	private JComboBox<String> categoryComboBox;
+	private JComboBox<String> rarityComboBox;
+	private JComboBox<String> coinComboBox;
+	private JComboBox<String> attunementComboBox;
+	private JButton createButton;
+	private JButton exportButton;
+	private JButton resetButton;
+
+	private Image image;
 
 	// init enums into the cache
 	static {
@@ -46,151 +72,151 @@ public class MagicItemCreatePanel extends JPanel {
 		this.validator = new FieldValidator();
 
 		setLayout(null);
-
-		JLabel lblNewLabel = new JLabel("MAGIC ITEM NAME");
-		lblNewLabel.setForeground(new Color(238, 238, 236));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(172, 12, 214, 37);
-		add(lblNewLabel);
-		
-		txtFeMessageStones = new JTextField();
-		txtFeMessageStones.setHorizontalAlignment(SwingConstants.CENTER);
-		txtFeMessageStones.setFont(new Font("Dialog", Font.PLAIN, 14));
-		txtFeMessageStones.setBounds(50, 56, 460, 37);
-//		txtFeMessageStones.setOpaque(false);
-		add(txtFeMessageStones);
-		txtFeMessageStones.setColumns(10);
-		
-		JLabel lblCategory = new JLabel("CATEGORY");
-		lblCategory.setForeground(new Color(238, 238, 236));
-		lblCategory.setBounds(50, 133, 99, 15);
-		add(lblCategory);
-		
-		JLabel lblRarity = new JLabel("RARITY");
-		lblRarity.setForeground(new Color(238, 238, 236));
-		lblRarity.setBounds(50, 170, 70, 15);
-		add(lblRarity);
-		
-		JLabel lblPrice = new JLabel("PRICE");
-		lblPrice.setForeground(new Color(238, 238, 236));
-		lblPrice.setBounds(287, 170, 70, 15);
-		add(lblPrice);
-		
-		JLabel lblDescription = new JLabel("DESCRIPTION");
-		lblDescription.setForeground(new Color(238, 238, 236));
-		lblDescription.setBounds(51, 218, 121, 15);
-		add(lblDescription);
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(46, 245, 464, 331);
-		textArea.setFont(new Font("Dialog", Font.PLAIN, 14));
-		textArea.setLineWrap(true);
-		textArea.setWrapStyleWord(true);
-		add(textArea);
-
-		JComboBox comboBox = new JComboBox();
-		Object[] categoryOptions = categoryEnum.stream().map(c -> c.getString("name")).toArray();
-		comboBox.setModel(new DefaultComboBoxModel(categoryOptions));
-		comboBox.setBounds(137, 128, 121, 24);
-		add(comboBox);
-
-		JComboBox comboBox_1 = new JComboBox();
-		Object[] rarityOptions = rarityEnum.stream().map(c -> c.getString("name")).toArray();
-		comboBox_1.setModel(new DefaultComboBoxModel(rarityOptions));
-		comboBox_1.setBounds(137, 165, 121, 24);
-		add(comboBox_1);
-		
-		txtFe = new JTextField();
-		txtFe.setFont(new Font("Dialog", Font.PLAIN, 14));
-		txtFe.setBounds(336, 165, 70, 25);
-		txtFe.setHorizontalAlignment(JTextField.RIGHT);
-		add(txtFe);
-		txtFe.setColumns(10);
-		
-		JComboBox comboBox_2 = new JComboBox();
-		Object[] coinOptions = coinEnum.stream().map(c -> c.getString("name")).toArray();
-		comboBox_2.setModel(new DefaultComboBoxModel(coinOptions));
-		comboBox_2.setBounds(410, 165, 100, 24);
-		add(comboBox_2);
-		
-		JLabel lblRequiresAttunement = new JLabel("REQ. ATTUNEMENT ?");
-		lblRequiresAttunement.setForeground(new Color(238, 238, 236));
-		lblRequiresAttunement.setBounds(287, 133, 156, 15);
-		add(lblRequiresAttunement);
-		
-		JComboBox comboBox_3 = new JComboBox();
-		comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"No", "Yes"}));
-		comboBox_3.setBounds(448, 128, 63, 25);
-		add(comboBox_3);
-
-		JButton btnCreate = new JButton("CREATE");
-		btnCreate.setBounds(61, 598, 88, 25);
-		btnCreate.addActionListener(al -> {
-			// validate text fields
-			validator.validateRequiredFields(txtFeMessageStones, txtFe, textArea);
-
-			// gather values, resolve and prepare insert data
-			CMap data = new CMap(
-
-				"title", txtFeMessageStones.getText(),
-				"description", textArea.getText(),
-				"attunement", "Yes".equals(comboBox_3.getSelectedItem()) ? true : false,
-				"price", Double.valueOf(txtFe.getText()).intValue(),
-
-				"category_id", categoryEnum.stream()
-					.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
-					.map(e -> e.getLong("id"))
-					.findFirst().get(),
-
-				"rarity_id", rarityEnum.stream()
-					.filter(e -> e.getString("name").equals(comboBox_1.getSelectedItem()))
-					.map(e -> e.getLong("id"))
-					.findFirst().get(),
-
-				"coin_id", coinEnum.stream()
-					.filter(e -> e.getString("name").equals(comboBox_2.getSelectedItem()))
-					.map(e -> e.getLong("id"))
-					.findFirst().get());
-
-			// check data
-			System.out.println(data);
-
-			try {
-				magicItemService.createMagicItem(data);
-			} catch (RuntimeException e) {
-				// if insert doesnt go well
-			}
-		});
-		add(btnCreate);
-
-		JButton btnExport = new JButton("EXPORT");
-		btnExport.setBounds(240, 598, 88, 25);
-		add(btnExport);
-
-		JButton btnReset = new JButton("RESET");
-		btnReset.setBounds(410, 598, 88, 25);
-		btnReset.addActionListener(al -> {
-			// clear all the fields and reset options
-			txtFeMessageStones.setText("");
-			txtFe.setText("");
-			textArea.setText("");
-			comboBox.setSelectedIndex(0);
-			comboBox_1.setSelectedIndex(0);
-			comboBox_2.setSelectedIndex(0);
-			comboBox_3.setSelectedIndex(0);
-		});
-		add(btnReset);
-
+		initializeComponents();
 	}
 
 	@Override
 	  protected void paintComponent(Graphics g) {
-
 	    super.paintComponent(g);
 	    // image, x-os, y-os
-	       g.drawImage(image, -20, -52, null);
+	    g.drawImage(image, -20, -52, null);
 	}
 
+	private void initializeComponents() {
+		initializeLabels();
+		initializeTextFields();
+		initializeTextAreas();
+		initializeComboBoxes();
+		initializeButtons();
+	}
+
+	private void initializeLabels() {
+		// labels
+		titleLabel = createBasicLabel("title_label", "MAGIC ITEM NAME", WHITE);
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titleLabel.setBounds(172, 12, 214, 37);
+		add(titleLabel);
+
+		categoryLabel = createBasicLabel("category_label", "CATEGORY", WHITE);
+		categoryLabel.setBounds(50, 133, 99, 15);
+		add(categoryLabel);
+		
+		rarityLabel = createBasicLabel("rarity_label", "RARITY", WHITE);
+		rarityLabel.setBounds(50, 170, 70, 15);
+		add(rarityLabel);
+
+		attunementLabel = createBasicLabel("attunement_label", "REQ. ATTUNEMENT ?", WHITE);
+		attunementLabel.setBounds(287, 133, 156, 15);
+		add(attunementLabel);
+
+		priceLabel = createBasicLabel("price_label", "PRICE", WHITE);
+		priceLabel.setBounds(287, 170, 70, 15);
+		add(priceLabel);
+		
+		descriptionLabel = createBasicLabel("description_label", "DESCRIPTION", WHITE);
+		descriptionLabel.setBounds(51, 218, 121, 15);
+		add(descriptionLabel);
+	}
+
+	private void initializeTextFields() {
+		titleField = createBasicTextField("title", DIALOG_PLAIN_14, SwingConstants.CENTER, 10);
+		titleField.setBounds(50, 56, 460, 37);
+		add(titleField);
+
+		priceField = createBasicTextField("price", DIALOG_PLAIN_14, JTextField.RIGHT, 10);
+		priceField.setBounds(336, 165, 70, 25);
+		add(priceField);
+	}
+
+	private void initializeTextAreas() {
+		descriptionArea = createBasicTextArea("description", DIALOG_PLAIN_14, true, true);
+		descriptionArea.setBounds(46, 245, 464, 331);
+		add(descriptionArea);
+	}
+	
+	private void initializeComboBoxes() {
+		categoryComboBox = createBasicComboBox("category_options", getEnumNames(categoryEnum));
+		categoryComboBox.setBounds(137, 128, 121, 24);
+		add(categoryComboBox);
+
+		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(rarityEnum));
+		rarityComboBox.setBounds(137, 165, 121, 24);
+		add(rarityComboBox);
+
+		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(coinEnum));
+		coinComboBox.setBounds(410, 165, 100, 24);
+		add(coinComboBox);
+
+		attunementComboBox = createBasicComboBox("attunement_options", "No", "Yes");
+		attunementComboBox.setBounds(448, 128, 63, 25);
+		add(attunementComboBox);
+	}
+
+	private List<String> getEnumNames(List<CMap> enumList) {
+		return enumList.stream()
+			.map(e -> e.getString("name"))
+			.collect(Collectors.toList());
+	}
+
+	private void initializeButtons() {
+		createButton = createBasicButton("create_button", "CREATE", this::createMagicItemAction);
+		createButton.setBounds(61, 598, 88, 25);
+		add(createButton);
+
+		exportButton = createBasicButton("export_button", "EXPORT", null);
+		exportButton.setBounds(240, 598, 88, 25);
+		add(exportButton);
+
+		resetButton = createBasicButton("reset_button", "RESET", this::resetFieldsAction);
+		resetButton.setBounds(410, 598, 88, 25);
+		add(resetButton);
+	}
+
+	private void createMagicItemAction(ActionEvent actionEvent) {
+		// validate text fields
+		validator.validateRequiredFields(titleField, priceField, descriptionArea);
+
+		// gather values, resolve and prepare insert data
+		CMap data = new CMap(
+			"title", titleField.getText(),
+			"description", descriptionArea.getText(),
+			"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
+			"price", Double.valueOf(priceField.getText()).intValue(),
+			"category_id", getEnumIdBySelectedComboBoxValue(categoryEnum, categoryComboBox),
+			"rarity_id", getEnumIdBySelectedComboBoxValue(rarityEnum, rarityComboBox),
+			"coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, coinComboBox)
+		);
+
+		// check data
+		System.out.println(data);
+
+		try {
+			magicItemService.createMagicItem(data);
+		} catch (RuntimeException e) {
+			// create dialog
+		}
+	}
+
+	private Long getEnumIdBySelectedComboBoxValue(List<CMap> enumList, JComboBox<String> comboBox) {
+		return enumList.stream()
+			.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
+			.map(e -> e.getLong("id"))
+			.findFirst()
+			.get();
+	}
+
+	private void resetFieldsAction(ActionEvent actionEvent) {
+		// clear all the fields and reset options
+		titleField.setText("");
+		priceField.setText("");
+		descriptionArea.setText("");
+		categoryComboBox.setSelectedIndex(0);
+		rarityComboBox.setSelectedIndex(0);
+		coinComboBox.setSelectedIndex(0);
+		attunementComboBox.setSelectedIndex(0);
+	}
+
+	// this will be cached on higher level
 	private static void loadEnums() {
 		EnumService enumService = AccessibleContext.getBean(EnumService.class);
 		categoryEnum = enumService.getCategoryEnum();

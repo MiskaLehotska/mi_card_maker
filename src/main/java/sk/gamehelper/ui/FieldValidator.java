@@ -7,6 +7,9 @@ import java.util.function.Predicate;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
+import sk.gamehelper.exceptions.ExceedingFieldLength;
+import sk.gamehelper.exceptions.RequiredFieldValidationError;
+
 public class FieldValidator {
 
 	private static final String REQUIRED_FIELDS_EMPTY_MESSAGE = " fields are required and they cannot be empty!";

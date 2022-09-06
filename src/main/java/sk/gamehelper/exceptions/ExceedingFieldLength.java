@@ -1,4 +1,4 @@
-package sk.gamehelper.ui;
+package sk.gamehelper.exceptions;
 
 public class ExceedingFieldLength extends RuntimeException {
 

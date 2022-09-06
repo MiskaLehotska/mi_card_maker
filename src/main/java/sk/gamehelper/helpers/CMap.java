@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
+import sk.gamehelper.exceptions.InconvertableTypeException;
+
 /**
  * Convertible map which provides convenient methods for getting value in
  * desired type if possible
@@ -29,14 +31,14 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 			throw new IllegalArgumentException("Map must consists of even number of arguments/pairs (key;value)");
 		}
 
-		for (int i = 0, j = 1; j < length; i+=2, j+=2) {
+		for (int i = 0, j = 1; j < length; i += 2, j += 2) {
 			String firstObject = String.valueOf(keyValuePairs[i]);
 			Object secondObject = keyValuePairs[j];
 			put(firstObject, secondObject);
 		}
 	}
 
-	public CMap (Map<String, Object> map) {
+	public CMap(Map<String, Object> map) {
 		putAll(map);
 	}
 
@@ -56,7 +58,7 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 			return null;
 		} else if (object instanceof Long) {
 			return (Long) object;
-		} else if(object instanceof Integer) {
+		} else if (object instanceof Integer) {
 			return ((Integer) object).longValue();
 		}
 		throw new InconvertableTypeException(object, Long.class);
@@ -137,5 +139,4 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 
 		throw new InconvertableTypeException(object, LocalDateTime.class);
 	}
-
 }

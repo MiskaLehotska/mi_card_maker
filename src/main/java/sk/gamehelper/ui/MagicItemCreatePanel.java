@@ -11,7 +11,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,6 +130,16 @@ public class MagicItemCreatePanel extends JPanel {
 
 		priceField = createBasicTextField("price", DIALOG_PLAIN_14, JTextField.RIGHT, 10);
 		priceField.setBounds(336, 165, 70, 25);
+		priceField.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent keyEvent) {
+				int keyChar = keyEvent.getKeyChar();
+				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
+					priceField.setEditable(true);
+				} else {
+					priceField.setEditable(false);
+				}
+			}
+		});
 		add(priceField);
 	}
 
@@ -137,7 +148,7 @@ public class MagicItemCreatePanel extends JPanel {
 		descriptionArea.setBounds(46, 245, 464, 331);
 		add(descriptionArea);
 	}
-	
+
 	private void initializeComboBoxes() {
 		categoryComboBox = createBasicComboBox("category_options", getEnumNames(categoryEnum));
 		categoryComboBox.setBounds(137, 128, 121, 24);

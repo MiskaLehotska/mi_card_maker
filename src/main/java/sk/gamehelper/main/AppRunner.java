@@ -111,6 +111,13 @@ public class AppRunner {
 			
 			MagicItem magicItem = new MagicItem().setByData(miData);
 			System.out.println(magicItem);
+			
+			// you can call selectByQuery() on database object now to get list of required objects
+			List<MagicItem> list = new MagicItem().selectByQuery("n_id", QueryOperator.GREATER_THAN_EQUAL, 20);
+			list.forEach(System.out::println);
+
+			list = new MagicItem().selectByQuery(queryParams);
+			list.forEach(System.out::println);
 		}
 	}
 }

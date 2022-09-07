@@ -202,7 +202,7 @@ public class MagicItemCreatePanel extends JPanel {
 			"title", titleField.getText(),
 			"description", descriptionArea.getText(),
 			"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
-			"price", Double.valueOf(priceField.getText()).intValue(),
+			"price", Integer.valueOf(priceField.getText()),
 			"category_id", getEnumIdBySelectedComboBoxValue(categoryEnum, categoryComboBox),
 			"rarity_id", getEnumIdBySelectedComboBoxValue(rarityEnum, rarityComboBox),
 			"coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, coinComboBox)

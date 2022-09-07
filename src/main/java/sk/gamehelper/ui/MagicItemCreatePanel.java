@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import sk.gamehelper.config.AccessibleContext;
+import sk.gamehelper.exceptions.RequiredFieldValidationError;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
@@ -31,6 +33,7 @@ import sk.gamehelper.services.MagicItemService;
 public class MagicItemCreatePanel extends JPanel {
 
 	private static final long serialVersionUID = 7797469423579293767L;
+
 	private static final Color WHITE = new Color(238, 238, 236);
 	private static final Font DIALOG_PLAIN_14 = new Font("Dialog", Font.PLAIN, 14);
 
@@ -164,7 +167,7 @@ public class MagicItemCreatePanel extends JPanel {
 		createButton.setBounds(61, 598, 88, 25);
 		add(createButton);
 
-		exportButton = createBasicButton("export_button", "EXPORT", null);
+		exportButton = createBasicButton("export_button", "EXPORT", this::exportAction);
 		exportButton.setBounds(240, 598, 88, 25);
 		add(exportButton);
 
@@ -174,8 +177,14 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void createMagicItemAction(ActionEvent actionEvent) {
-		// validate text fields
-		validator.validateRequiredFields(titleField, priceField, descriptionArea);
+		// TODO: think about global exception handling for UI
+		try {
+			validator.validateRequiredFields(titleField, priceField, descriptionArea);
+		} catch (RequiredFieldValidationError rfve) {
+			JOptionPane.showMessageDialog(this, rfve.getMessage(), 
+				"Field validation", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 
 		// gather values, resolve and prepare insert data
 		CMap data = new CMap(
@@ -188,7 +197,7 @@ public class MagicItemCreatePanel extends JPanel {
 			"coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, coinComboBox)
 		);
 
-		// check data
+		// check data -- DELETE THIS
 		System.out.println(data);
 
 		try {
@@ -196,8 +205,9 @@ public class MagicItemCreatePanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "A new Magic Item \"" + data.getString("title") 
 			+ "\" has been created!", "Magic item created", JOptionPane.INFORMATION_MESSAGE);
 		} catch (RuntimeException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(), 
+			JOptionPane.showMessageDialog(this, e.getMessage(),
 				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 	}
 
@@ -207,6 +217,16 @@ public class MagicItemCreatePanel extends JPanel {
 			.map(e -> e.getLong("id"))
 			.findFirst()
 			.get();
+	}
+
+	private void exportAction(ActionEvent actionEvent) {
+		try {
+			validator.validateRequiredFields(titleField, priceField, descriptionArea);
+		} catch (RequiredFieldValidationError rfve) {
+			JOptionPane.showMessageDialog(this, rfve.getMessage(),
+				"Field validation", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 	}
 
 	private void resetFieldsAction(ActionEvent actionEvent) {
@@ -220,11 +240,14 @@ public class MagicItemCreatePanel extends JPanel {
 		attunementComboBox.setSelectedIndex(0);
 	}
 
-	// this will be cached on higher level
+	// this will be cached at higher level
 	private static void loadEnums() {
 		EnumService enumService = AccessibleContext.getBean(EnumService.class);
 		categoryEnum = enumService.getCategoryEnum();
 		rarityEnum = enumService.getRarityEnum();
 		coinEnum = enumService.getCoinEnum();
+//		categoryEnum = Collections.emptyList();
+//		rarityEnum = Collections.emptyList();
+//		coinEnum = Collections.emptyList();
 	}
 }

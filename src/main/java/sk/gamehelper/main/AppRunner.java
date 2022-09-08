@@ -9,6 +9,7 @@ import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
+import sk.gamehelper.db.Table;
 import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.helpers.QueryParams;
@@ -24,19 +25,19 @@ public class AppRunner {
 
 			// give me coin id by coin acronym (gp)
 			Long coinId = db.select("n_id")
-				.from("e_coin")
+				.from(Table.COIN_ENUM)
 				.where("s_acronym", QueryOperator.LIKE, "g")
 				.asLong();
 
 			// give me category id 1
 			Long categoryId = db.select("n_id")
-				.from("e_category")
+				.from(Table.CATEGORY_ENUM)
 				.where("n_id", QueryOperator.LESS_THAN, 2)
 				.asLong();
 			
 			// give me rarity id by rarity name (Uncommon)
 			Long rarityId = db.select("n_id")
-				.from("e_rarity")
+				.from(Table.RARITY_ENUM)
 				.where("s_name", "Uncommon") // QueryOperator.EQUALS je default
 				.asLong();
 
@@ -62,8 +63,8 @@ public class AppRunner {
 			List<CMap> magicItems = 
 				db.select("A.n_id", "A.s_title", "B.s_name AS category", "A.n_price", "C.s_acronym AS currency")
 					.distinct()
-					.from("t_magic_item A")
-					.leftJoin("e_category B")
+					.from(Table.MAGIC_ITEM + " A")
+					.leftJoin(Table.CATEGORY_ENUM + " B")
 					.on("A.n_category_id", "B.n_id")
 					.join("e_coin C")
 					.on("A.n_coin_id", "C.n_id")
@@ -74,14 +75,14 @@ public class AppRunner {
 
 			// select magic items where its id is one of 3, 4, or 7
 			magicItems = db.select()
-				.from("t_magic_item")
+				.from(Table.MAGIC_ITEM)
 				.whereIn("n_id", Arrays.asList(3, 4, 7))
 				.asList();
 			
 			// multiple columns ON clause
 			List<CMap> data = db.select("A.*")
-				.from("t_magic_item A")
-				.join("e_coin B")
+				.from(Table.MAGIC_ITEM + " A")
+				.join(Table.COIN_ENUM + " B")
 				.on("A.n_coin_id", "B.n_id", "A.n_category_id", "B.n_id")
 				.asList();
 
@@ -89,7 +90,7 @@ public class AppRunner {
 
 			// order by and limit test - order by supports integers or strings
 			System.out.println(db.select()
-				.from("e_rarity")
+				.from(Table.RARITY_ENUM)
 				.where("n_id", QueryOperator.LESS_THAN, 100)
 				.orderBy(1, OrderByDirection.DESC)
 				.limit(3)
@@ -103,13 +104,20 @@ public class AppRunner {
 			queryParams.removeParam("coin_id");
 
 			CMap miData = db.select()
-				.from("t_magic_item")
+				.from(Table.MAGIC_ITEM)
 				.where(queryParams)
 				.limit(1)
 				.asMap();
 			
 			MagicItem magicItem = new MagicItem().setByData(miData);
 			System.out.println(magicItem);
+			
+			// you can call selectByQuery() on database object now to get list of required objects
+			List<MagicItem> list = new MagicItem().selectByQuery("n_id", QueryOperator.GREATER_THAN_EQUAL, 20);
+			list.forEach(System.out::println);
+
+			list = new MagicItem().selectByQuery(queryParams);
+			list.forEach(System.out::println);
 		}
 	}
 }

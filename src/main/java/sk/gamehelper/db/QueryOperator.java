@@ -4,7 +4,9 @@ public enum QueryOperator {
 
 	EQUALS(" = "),
 	LESS_THAN(" < "),
+	LESS_THAN_EQUAL(" <= "),
 	GREATER_THAN(" > "),
+	GREATER_THAN_EQUAL(" >= "),
 	NOT_EQUAL(" <> "),
 	LIKE(" LIKE '%"),
 	NOT_LIKE(" NOT LIKE '%");

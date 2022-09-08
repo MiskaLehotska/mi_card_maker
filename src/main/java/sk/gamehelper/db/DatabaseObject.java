@@ -1,7 +1,10 @@
 package sk.gamehelper.db;
 
+import static java.util.stream.Collectors.toList;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -10,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.QueryParams;
 
 public abstract class DatabaseObject<T> {
 
@@ -33,6 +37,30 @@ public abstract class DatabaseObject<T> {
 			.from(databaseTable)
 			.where(identifier, id)
 			.asMap());
+	}
+
+	public List<T> selectByQuery(String column, Object value) {
+		return selectByQuery(column, QueryOperator.EQUALS, value);
+	}
+
+	public List<T> selectByQuery(String column, QueryOperator queryOperator, Object value) {
+		return database.select()
+			.from(databaseTable)
+			.where(column, queryOperator, value)
+			.asList()
+			.stream()
+			.map(this::setByData)
+			.collect(toList());
+	}
+
+	public List<T> selectByQuery(QueryParams queryParams) {
+		return database.select()
+			.from(databaseTable)
+			.where(queryParams)
+			.asList()
+			.stream()
+			.map(this::setByData)
+			.collect(toList());
 	}
 
 	public void insert() {
@@ -89,6 +117,13 @@ public abstract class DatabaseObject<T> {
 		return insert.append(columns)
 				.append(values)
 				.toString();
+	}
+
+	public void update() {
+		// UPDATE databaseTable SET column = value, column = value, column = value
+		// WHERE identifier = id;
+		// + do not forget to change validity dates
+		// insert() -> new Item
 	}
 
 	protected abstract T setByData(CMap data);

@@ -18,6 +18,7 @@ import sk.gamehelper.config.AppConfig;
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
+	private MagicItemCreatePanel createPanel;
 
 	/**
 	 * Launch the application.
@@ -40,8 +41,9 @@ public class MainWindow extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws IOException 
 	 */
-	public MainWindow() {
+	public MainWindow() throws IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1080, 600);
 
@@ -50,17 +52,21 @@ public class MainWindow extends JFrame {
 		JMenuItem create = new JMenuItem("Create magic item");
 //		create.addActionListener(e -> System.out.println("I have chosen to create application"));
 		create.addActionListener(e -> {
-			try {
-				JFrame f = new JFrame();
-				f.setSize(555, 680);
-				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				f.setLocationRelativeTo(null);
-				f.add(new MagicItemCreatePanel(ImageIO.read(
-					MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg"))));
-				f.setVisible(true);
-			} catch (IOException ex) {
-				ex.printStackTrace();
+			JFrame f = new JFrame();
+			f.setSize(555, 680);
+			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			f.setLocationRelativeTo(null);
+
+			if (createPanel == null) {
+				try {
+					createPanel = new MagicItemCreatePanel(ImageIO.read(
+							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
+			f.add(createPanel);
+			f.setVisible(true);
 		});
 		menu.add(create);
 		menuBar.add(menu);

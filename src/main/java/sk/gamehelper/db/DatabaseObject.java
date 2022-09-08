@@ -44,20 +44,19 @@ public abstract class DatabaseObject<T> {
 	}
 
 	public List<T> selectByQuery(String column, QueryOperator queryOperator, Object value) {
-		return database.select()
+		return selectBySelect(database.select()
 			.from(databaseTable)
-			.where(column, queryOperator, value)
-			.asList()
-			.stream()
-			.map(this::setByData)
-			.collect(toList());
+			.where(column, queryOperator, value));
 	}
 
 	public List<T> selectByQuery(QueryParams queryParams) {
-		return database.select()
+		return selectBySelect(database.select()
 			.from(databaseTable)
-			.where(queryParams)
-			.asList()
+			.where(queryParams));
+	}
+
+	private List<T> selectBySelect(Select select) {
+		return select.asList()
 			.stream()
 			.map(this::setByData)
 			.collect(toList());
@@ -120,6 +119,7 @@ public abstract class DatabaseObject<T> {
 	}
 
 	public void update() {
+		jdbcTemplate.update("UPDATE " + databaseTable + " SET "); // construct this update statement
 		// UPDATE databaseTable SET column = value, column = value, column = value
 		// WHERE identifier = id;
 		// + do not forget to change validity dates

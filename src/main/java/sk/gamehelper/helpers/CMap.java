@@ -81,10 +81,14 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 		} else if (object instanceof UUID) {
 			return (UUID) object;
 		} else if (object instanceof String) {
+			String uuid = (String) object;
+			if (uuid.trim().isEmpty()) {
+				return null;
+			}
 			try {
-				return UUID.fromString(object.toString());
+				return UUID.fromString(uuid);
 			} catch (IllegalArgumentException e) {
-
+				// do nothing
 			}
 		}
 		throw new InconvertableTypeException(object, UUID.class);

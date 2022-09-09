@@ -2,6 +2,7 @@ package sk.gamehelper.main;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -9,8 +10,8 @@ import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
-import sk.gamehelper.db.Table;
 import sk.gamehelper.db.Select.OrderByDirection;
+import sk.gamehelper.db.Table;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.helpers.QueryParams;
 
@@ -113,11 +114,26 @@ public class AppRunner {
 			System.out.println(magicItem);
 			
 			// you can call selectByQuery() on database object now to get list of required objects
-			List<MagicItem> list = new MagicItem().selectByQuery("n_id", QueryOperator.GREATER_THAN_EQUAL, 20);
+			List<MagicItem> list = db.select()
+				.from("v_magic_item")
+				.where("n_id", QueryOperator.GREATER_THAN_EQUAL, 20)
+				.asList()
+				.stream()
+				.map(e -> new MagicItem().setByData(e))
+				.collect(Collectors.toList());
+
 			list.forEach(System.out::println);
 
-			list = new MagicItem().selectByQuery(queryParams);
-			list.forEach(System.out::println);
+			MagicItem mItem = new MagicItem();
+			CMap lastMagicItem = db.select()
+				.from("v_magic_item")
+				.orderBy("n_id", OrderByDirection.DESC)
+				.limit(1)
+				.asMap();
+			mItem.setByData(lastMagicItem);
+			System.out.println("old id before update: " + mItem.getId());
+			mItem.update();
+			System.out.println("new id after update: " + mItem.getId());
 		}
 	}
 }

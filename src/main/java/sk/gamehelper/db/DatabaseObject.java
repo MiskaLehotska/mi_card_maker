@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -39,32 +40,8 @@ public abstract class DatabaseObject<T> {
 			.asMap());
 	}
 
-	public List<T> selectByQuery(String column, Object value) {
-		return selectByQuery(column, QueryOperator.EQUALS, value);
-	}
-
-	public List<T> selectByQuery(String column, QueryOperator queryOperator, Object value) {
-		return selectBySelect(database.select()
-			.from(databaseTable)
-			.where(column, queryOperator, value));
-	}
-
-	public List<T> selectByQuery(QueryParams queryParams) {
-		return selectBySelect(database.select()
-			.from(databaseTable)
-			.where(queryParams));
-	}
-
-	private List<T> selectBySelect(Select select) {
-		return select.asList()
-			.stream()
-			.map(this::setByData)
-			.collect(toList());
-	}
-
 	public void insert() {
-		String write = Timestamp.valueOf(LocalDateTime.now()).toString();
-		String insertStatement = constructInsertStatement(write);
+		String insertStatement = constructInsertStatement();
 		logger.info(insertStatement);
 		jdbcTemplate.update(insertStatement);
 
@@ -76,10 +53,12 @@ public abstract class DatabaseObject<T> {
 			.asMap());
 	}
 
-	private String constructInsertStatement(String write) {
+	private String constructInsertStatement() {
+		String write = getCurrentTimestamp().toString();
+
 		CMap data = getAsDbRow();
 		data.remove(identifier);
-		data.remove("u_uid_id");
+		data.put("u_uid_id", UUID.randomUUID().toString());
 		data.put("d_to", INFINITY);
 		data.put("d_from", write);
 		data.put("t_write", write);
@@ -96,6 +75,7 @@ public abstract class DatabaseObject<T> {
 			columns.append(",");
 
 			Object value = entry.getValue();
+			// TODO: centralize this transformation
 			if (value instanceof CharSequence) {
 				value = value.toString()
 					.replace('\n', ' ')
@@ -119,11 +99,35 @@ public abstract class DatabaseObject<T> {
 	}
 
 	public void update() {
-		jdbcTemplate.update("UPDATE " + databaseTable + " SET "); // construct this update statement
-		// UPDATE databaseTable SET column = value, column = value, column = value
-		// WHERE identifier = id;
-		// + do not forget to change validity dates
-		// insert() -> new Item
+		// invalidate record with current ID
+		String updateStatement = constructUpdateStatement();
+		logger.info(updateStatement);
+		jdbcTemplate.update(updateStatement);
+
+		// insert new record with new data and ID
+		insert();
+	}
+
+	private String constructUpdateStatement() {
+		String write = getCurrentTimestamp().toString();
+		CMap data = getAsDbRow();
+
+		StringBuilder update = new StringBuilder("UPDATE ");
+		update.append(databaseTable);
+		update.append(" SET d_to = '");
+		update.append(write);
+		update.append("', t_write = '");
+		update.append(write);
+		update.append("' WHERE ");
+		update.append(identifier);
+		update.append(" = ");
+		update.append(data.getLong(identifier));
+
+		return update.toString();
+	}
+
+	private Timestamp getCurrentTimestamp() {
+		return Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	protected abstract T setByData(CMap data);

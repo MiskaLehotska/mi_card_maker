@@ -64,6 +64,8 @@ public class MainWindow extends JFrame {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+			} else {
+				createPanel.clear();
 			}
 			f.add(createPanel);
 			f.setVisible(true);

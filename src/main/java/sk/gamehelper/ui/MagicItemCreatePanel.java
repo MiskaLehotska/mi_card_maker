@@ -251,6 +251,10 @@ public class MagicItemCreatePanel extends JPanel {
 		attunementComboBox.setSelectedIndex(0);
 	}
 
+	public void clear() {
+		this.resetFieldsAction(null);
+	}
+
 	// this will be cached at higher level
 	private static void loadEnums() {
 		EnumService enumService = AccessibleContext.getBean(EnumService.class);

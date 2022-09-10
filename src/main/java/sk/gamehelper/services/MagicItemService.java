@@ -8,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
-import sk.gamehelper.db.DatabaseObject;
+import sk.gamehelper.db.QueryOperator;
+import sk.gamehelper.db.Select;
 import sk.gamehelper.db.Table;
 import sk.gamehelper.exceptions.RecordAlreadyExists;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.helpers.MessagesLoader;
+import sk.gamehelper.helpers.QueryParams;
 
 @Component
 public class MagicItemService {
@@ -48,4 +50,53 @@ public class MagicItemService {
 
 		itemToUpdate.update();
 	}
+	
+	public List<CMap> searchMagicItem(QueryParams params) {
+//		we are testing large amounth of data 
+//		validateParamSize(params);
+		
+		Object priceFrom = params.removeParam("from");
+		Object priceTo =  params.removeParam("to");
+		validatePrice(priceFrom, priceTo);
+		
+		Select select = db.select().from(Table.MAGIC_ITEM);
+
+		resolveStringParam(params, "title", select);
+		resolveStringParam(params, "description", select);
+		resolveIntegerParam(priceFrom, QueryOperator.GREATER_THAN_EQUAL, select);
+		resolveIntegerParam(priceTo, QueryOperator.LESS_THAN_EQUAL, select);
+
+		select.where(params);
+		
+		return select.asList();
+	}
+	
+	private void validateParamSize(QueryParams params) {
+		if(params.isEmpty()) {
+			throw new IllegalArgumentException(MessagesLoader.resolveMessage("missingParam"));
+		}
+	}
+	
+	private void resolveStringParam(QueryParams params, String paramName, Select select) {
+		Object param = params.removeParam(paramName);
+		if (param != null) {
+			select.where("s_" + paramName, QueryOperator.LIKE, param);
+		}
+	}
+	
+	private void resolveIntegerParam(Object paramName, QueryOperator operator, Select select) {
+		if(paramName != null) {
+			select.where((paramName.toString()), operator, paramName.toString());
+		}
+	}
+	
+	private void validatePrice(Object from, Object to) {
+		Integer valueFrom = (Integer) from;
+		Integer valueTo = (Integer) to;
+
+		if ((valueFrom != null && valueTo != null) && (valueFrom < valueTo && valueFrom < 0)) {
+			throw new IllegalArgumentException(MessagesLoader.resolveMessage("priceValidation", from, to));
+		}
+	}
+	
 }

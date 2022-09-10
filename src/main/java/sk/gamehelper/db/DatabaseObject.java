@@ -1,10 +1,7 @@
 package sk.gamehelper.db;
 
-import static java.util.stream.Collectors.toList;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -14,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.db.Select.OrderByDirection;
 import sk.gamehelper.helpers.CMap;
-import sk.gamehelper.helpers.QueryParams;
 
 public abstract class DatabaseObject<T> {
 
@@ -48,7 +44,7 @@ public abstract class DatabaseObject<T> {
 		// get this record from db and set generated fields
 		setByData(database.select()
 			.from(databaseTable)
-			.orderBy("n_id", OrderByDirection.DESC)
+			.orderBy(identifier, OrderByDirection.DESC)
 			.limit(1)
 			.asMap());
 	}

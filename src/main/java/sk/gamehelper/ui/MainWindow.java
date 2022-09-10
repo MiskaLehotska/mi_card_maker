@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
@@ -191,7 +192,7 @@ public class MainWindow {
 		btnNewButton.setBounds(22, 468, 92, 25);
 		contentPane.add(btnNewButton);
 		
-		JButton btnSearch = new JButton("Search");
+		JButton btnSearch = SimpleComponentCreator.createBasicButton("searchButton", "SEARCH", this::searchDataAction);
 		btnSearch.setBounds(22, 431, 92, 25);
 		contentPane.add(btnSearch);
 		
@@ -234,15 +235,22 @@ public class MainWindow {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		panel.add(scrollPane);
-		
-		table = new JTable(new Object[][] {
-			{"Mjolnir", "This is mjolnir hammer", "Weapon", "Legendary", 456, "Electrum", true}
-		}, new Object[] {
-				"Title", "Description", "Category", "Rarity", "Price", "Currency", "Attunement"
+
+		Object[][] data = new Object[][] {
+//			{null, null, null, null, null, null, null}
+		};
+		table = new JTable(data, new Object[] {
+				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
 		});
+		// set title and description column lengths
+		table.getColumnModel().getColumn(0).setPreferredWidth(200);
+		table.getColumnModel().getColumn(1).setPreferredWidth(270);
+
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 
+//		System.out.println(table.getColumnModel().getColumn(0).getWidth());
+		
 		frame.setVisible(true);
 	}
 
@@ -292,6 +300,10 @@ public class MainWindow {
 		comboBox_1.setSelectedIndex(0);
 		comboBox_2.setSelectedIndex(0);
 		comboBox_3.setSelectedIndex(0);
+	}
+	
+	private void searchDataAction(ActionEvent actionEvent) {
+		System.out.println("searching");
 	}
 
 }

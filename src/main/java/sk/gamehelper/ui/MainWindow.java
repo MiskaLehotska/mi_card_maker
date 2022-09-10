@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,9 @@ import javax.swing.table.DefaultTableModel;
 
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.QueryParams;
 import sk.gamehelper.services.EnumService;
+import sk.gamehelper.services.MagicItemService;
 
 public class MainWindow {
 
@@ -49,8 +52,10 @@ public class MainWindow {
 	private JComboBox<String> comboBox_2;
 	private JComboBox<String> comboBox_3;
 
+	private MagicItemService magicItemService;
+
 	private JTable table;
-	
+
 	static {
 		loadEnums();
 	}
@@ -64,6 +69,8 @@ public class MainWindow {
 	 * @throws ClassNotFoundException 
 	 */
 	public MainWindow() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
+
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 1183, 719);
@@ -166,19 +173,19 @@ public class MainWindow {
 		});
 		contentPane.add(textField_3);
 
-		List<String> currencyEnumOptions = getEnumNames(coinEnum);
+		List<String> currencyEnumOptions = getEnumNames(coinEnum, "coin");
 		currencyEnumOptions.add(0, "");
 		comboBox = SimpleComponentCreator.createBasicComboBox("currency_combo", currencyEnumOptions);
 		comboBox.setBounds(22, 241, 124, 24);
 		contentPane.add(comboBox);
 
-		List<String> categoryEnumOptions = getEnumNames(categoryEnum);
+		List<String> categoryEnumOptions = getEnumNames(categoryEnum, "category");
 		categoryEnumOptions.add(0, "");
 		comboBox_1 = SimpleComponentCreator.createBasicComboBox("category_combo", categoryEnumOptions);
 		comboBox_1.setBounds(22, 294, 124, 24);
 		contentPane.add(comboBox_1);
 		
-		List<String> rarityEnumOptions = getEnumNames(rarityEnum);
+		List<String> rarityEnumOptions = getEnumNames(rarityEnum, "rarity");
 		rarityEnumOptions.add(0, "");
 		comboBox_2 = SimpleComponentCreator.createBasicComboBox("rarity_combo", rarityEnumOptions);
 		comboBox_2.setBounds(22, 344, 124, 24);
@@ -239,12 +246,17 @@ public class MainWindow {
 		Object[][] data = new Object[][] {
 //			{null, null, null, null, null, null, null}
 		};
-		table = new JTable(data, new Object[] {
-				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
-		});
+		table = new JTable(new DefaultTableModel(new Object[] {
+				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
+		}, 0));
+
+//		table = new JTable(data, new Object[] {
+//				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
+//		});
+		table.setAutoCreateRowSorter(true);
 		// set title and description column lengths
-		table.getColumnModel().getColumn(0).setPreferredWidth(200);
-		table.getColumnModel().getColumn(1).setPreferredWidth(270);
+		table.getColumnModel().getColumn(1).setPreferredWidth(200);
+		table.getColumnModel().getColumn(2).setPreferredWidth(270);
 
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
@@ -275,21 +287,21 @@ public class MainWindow {
 	public static List<CMap> getCoinEnum() {
 		return coinEnum;
 	}
-	
-	public static List<String> getEnumNames(List<CMap> enumList) {
+
+	public static List<String> getEnumNames(List<CMap> enumList, String enumName) {
 		return enumList.stream()
-			.map(e -> e.getString("name"))
+			.map(e -> e.getString(enumName + "_name"))
 			.collect(Collectors.toList());
 	}
 
-	public static Long getEnumIdBySelectedComboBoxValue(List<CMap> enumList, JComboBox<String> comboBox) {
+	public static Long getEnumIdBySelectedComboBoxValue(List<CMap> enumList, String enumName, JComboBox<String> comboBox) {
 		return enumList.stream()
-			.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
+			.filter(e -> e.getString(enumName + "_name").equals(comboBox.getSelectedItem()))
 			.map(e -> e.getLong("id"))
 			.findFirst()
 			.get();
 	}
-	
+
 	private void resetFieldsAction(ActionEvent actionEvent) {
 		// clear all the fields and reset options
 		textField.setText("");
@@ -300,10 +312,48 @@ public class MainWindow {
 		comboBox_1.setSelectedIndex(0);
 		comboBox_2.setSelectedIndex(0);
 		comboBox_3.setSelectedIndex(0);
+		// TODO: reset chosen sort column
 	}
-	
+
 	private void searchDataAction(ActionEvent actionEvent) {
-		System.out.println("searching");
+		QueryParams queryParams = new QueryParams();
+		if (!textField.getText().isEmpty())
+			queryParams.addParam("description", textField.getText());
+		if (!textField_1.getText().isEmpty())
+			queryParams.addParam("title", textField_1.getText());
+		if (!textField_2.getText().isEmpty())
+			queryParams.addParam("from", textField_2.getText());
+		if (!textField_3.getText().isEmpty())	
+			queryParams.addParam("to", textField_3.getText());
+
+		List<CMap> data = magicItemService.searchMagicItem(queryParams);
+		setTableData(data);
+	}
+
+	private void setTableData(List<CMap> data) {
+		DefaultTableModel dataModel = (DefaultTableModel) table.getModel();
+		// iterate over columns and get the whole row into cmap ... pre-populate the values in update window and if triggered, send even ID of the current magic item
+		if (table.getSelectedRow() != -1) {
+			System.out.println(table.getValueAt(table.getSelectedRow(), 0)); // getID
+		}
+		// delete all the records
+		dataModel.setRowCount(0);
+		// display new records
+		data.forEach(e -> dataModel.addRow(extractTableRow(e)));
+		table.setModel(dataModel);
+	}
+
+	private Object[] extractTableRow(CMap data) {
+		return new Object[] {
+			data.getLong("id"),
+			data.getString("title"),
+			data.getString("description"),
+			data.getString("category_name"),
+			data.getString("rarity_name"),
+			data.getInteger("price"),
+			data.getString("coin_name"),
+			data.getBoolean("attunement")
+		};
 	}
 
 }

@@ -145,15 +145,15 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void initializeComboBoxes() {
-		categoryComboBox = createBasicComboBox("category_options", getEnumNames(getCategoryEnum()));
+		categoryComboBox = createBasicComboBox("category_options", getEnumNames(getCategoryEnum(), "category"));
 		categoryComboBox.setBounds(137, 128, 121, 24);
 		add(categoryComboBox);
 
-		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(getRarityEnum()));
+		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(getRarityEnum(), "rarity"));
 		rarityComboBox.setBounds(137, 165, 121, 24);
 		add(rarityComboBox);
 
-		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(getCoinEnum()));
+		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(getCoinEnum(), "coin"));
 		coinComboBox.setBounds(410, 165, 100, 24);
 		add(coinComboBox);
 
@@ -199,9 +199,9 @@ public class MagicItemCreatePanel extends JPanel {
 			"description", descriptionArea.getText(),
 			"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
 			"price", Integer.valueOf(priceField.getText()),
-			"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), categoryComboBox),
-			"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), rarityComboBox),
-			"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), coinComboBox)
+			"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), "category", categoryComboBox),
+			"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), "rarity", rarityComboBox),
+			"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), "coin", coinComboBox)
 		);
 
 		try {

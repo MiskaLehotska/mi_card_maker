@@ -54,15 +54,14 @@ public class MagicItemService {
 	public List<CMap> searchMagicItem(QueryParams params) {
 //		we are testing large amounth of data 
 //		validateParamSize(params);
-		
+
 		Object priceFrom = params.removeParam("from");
 		Object priceTo =  params.removeParam("to");
 		validatePrice(priceFrom, priceTo);
 		
-		Select select = db.select("A.n_id, A.s_title", "A.s_description", "A.n_price", "A.d_from", "A.d_to", "A.t_write",
-				"B.s_name AS category_label",
-				"C.s_name AS rarity_label",
-				"D.s_name AS coin_label")
+		Select select = db.select("A.n_id, A.s_title", "A.s_description", "A.n_price", 
+				"A.b_attunement", "A.d_from", "A.d_to", "A.t_write", "B.s_category_name",
+				"C.s_rarity_name", "D.s_coin_name")
 			.from("v_magic_item A")
 			.join("ve_category B")
 			.on("A.n_category_id", "B.n_id")

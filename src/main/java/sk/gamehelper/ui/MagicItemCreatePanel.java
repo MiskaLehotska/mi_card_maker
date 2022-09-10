@@ -28,7 +28,6 @@ import javax.swing.SwingConstants;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.exceptions.RequiredFieldValidationError;
 import sk.gamehelper.helpers.CMap;
-import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
 
 public class MagicItemCreatePanel extends JPanel {
@@ -37,10 +36,6 @@ public class MagicItemCreatePanel extends JPanel {
 
 	private static final Color WHITE = new Color(238, 238, 236);
 	private static final Font DIALOG_PLAIN_14 = new Font("Dialog", Font.PLAIN, 14);
-
-	private static List<CMap> categoryEnum;
-	private static List<CMap> rarityEnum;
-	private static List<CMap> coinEnum;
 
 	private MagicItemService magicItemService;
 	private FieldValidator validator;
@@ -63,11 +58,6 @@ public class MagicItemCreatePanel extends JPanel {
 
 	private Image image;
 	private WindowType type;
-
-	// init enums into the cache
-	static {
-		loadEnums();
-	}
 
 	/**
 	 * Create the panel.
@@ -152,15 +142,15 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void initializeComboBoxes() {
-		categoryComboBox = createBasicComboBox("category_options", getEnumNames(categoryEnum));
+		categoryComboBox = createBasicComboBox("category_options", getEnumNames(MainWindow.getCategoryEnum()));
 		categoryComboBox.setBounds(137, 128, 121, 24);
 		add(categoryComboBox);
 
-		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(rarityEnum));
+		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(MainWindow.getRarityEnum()));
 		rarityComboBox.setBounds(137, 165, 121, 24);
 		add(rarityComboBox);
 
-		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(coinEnum));
+		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(MainWindow.getCoinEnum()));
 		coinComboBox.setBounds(410, 165, 100, 24);
 		add(coinComboBox);
 
@@ -212,9 +202,9 @@ public class MagicItemCreatePanel extends JPanel {
 			"description", descriptionArea.getText(),
 			"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
 			"price", Integer.valueOf(priceField.getText()),
-			"category_id", getEnumIdBySelectedComboBoxValue(categoryEnum, categoryComboBox),
-			"rarity_id", getEnumIdBySelectedComboBoxValue(rarityEnum, rarityComboBox),
-			"coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, coinComboBox)
+			"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), categoryComboBox),
+			"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), rarityComboBox),
+			"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), coinComboBox)
 		);
 
 		// check data -- DELETE THIS
@@ -276,16 +266,5 @@ public class MagicItemCreatePanel extends JPanel {
 		rarityComboBox.setSelectedIndex(map.getInteger("rarity"));
 		coinComboBox.setSelectedIndex(map.getInteger("coin"));
 		attunementComboBox.setSelectedIndex(map.getInteger("attunement"));
-	}
-
-	// this will be cached at higher level
-	private static void loadEnums() {
-		EnumService enumService = AccessibleContext.getBean(EnumService.class);
-		categoryEnum = enumService.getCategoryEnum();
-		rarityEnum = enumService.getRarityEnum();
-		coinEnum = enumService.getCoinEnum();
-//		categoryEnum = Collections.emptyList();
-//		rarityEnum = Collections.emptyList();
-//		coinEnum = Collections.emptyList();
 	}
 }

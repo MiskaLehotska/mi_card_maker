@@ -27,6 +27,9 @@ import javax.swing.border.EmptyBorder;
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
+import javax.swing.JScrollPane;
+import java.awt.GridLayout;
+import javax.swing.JTable;
 
 public class MainWindow {
 
@@ -46,6 +49,8 @@ public class MainWindow {
 	private JComboBox<String> comboBox_2;
 	private JComboBox<String> comboBox_3;
 
+	private JTable table;
+	
 	static {
 		loadEnums();
 	}
@@ -61,7 +66,7 @@ public class MainWindow {
 	public MainWindow() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(100, 100, 1080, 600);
+		frame.setBounds(100, 100, 1183, 719);
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Options");
@@ -222,6 +227,22 @@ public class MainWindow {
 		JLabel lblAttunement = new JLabel("Attunement");
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
+
+		JPanel panel = new JPanel();
+		panel.setBounds(158, 0, 1025, 661);
+		contentPane.add(panel);
+		panel.setLayout(new GridLayout(1, 0, 0, 0));
+		
+		JScrollPane scrollPane = new JScrollPane();
+		panel.add(scrollPane);
+		
+		table = new JTable(new Object[][] {
+			{"Mjolnir", "This is mjolnir hammer", "Weapon", "Legendary", 456, "Electrum", true}
+		}, new Object[] {
+				"Title", "Description", "Category", "Rarity", "Price", "Currency", "Attunement"
+		});
+		table.setFillsViewportHeight(true);
+		scrollPane.setViewportView(table);
 		
 		frame.setVisible(true);
 	}

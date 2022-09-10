@@ -25,6 +25,17 @@ public class ColumnNameTranslator {
 	}
 
 	public String removeColumnPrefix(String columnName) {
-		return columnName.substring(2);
+		String prefix = columnName.substring(0, columnName.indexOf('_'));
+		switch(prefix) {
+		case "s":
+		case "n":
+		case "t":
+		case "d":
+		case "b":
+		case "u":
+			return columnName.substring(2);
+		default:
+			return columnName;
+		}
 	}
 }

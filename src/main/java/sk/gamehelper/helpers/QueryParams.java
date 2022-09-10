@@ -30,7 +30,7 @@ public class QueryParams {
 	public Set<Map.Entry<String, Object>> getQueryEntries() {
 		return this.params.entrySet();
 	}
-	
+
 	public String getAsString(String paramName) {
 		return params.getString(paramName);
 	}
@@ -38,4 +38,9 @@ public class QueryParams {
 	public Integer getAsInteger(String paramName) {
 		return params.getInteger(paramName);
 	}
+
+	public boolean isEmpty() {
+		return params.isEmpty();
+	}
+
 }

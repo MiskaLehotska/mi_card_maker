@@ -23,6 +23,7 @@ import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
+import javax.swing.JScrollPane;
 
 public class MainWindow {
 
@@ -184,6 +185,12 @@ public class MainWindow {
 		JLabel lblAttunement = new JLabel("Attunement");
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(1057, 525, -895, -517);
+		
+		
+		contentPane.add(scrollPane);
 		
 		frame.setVisible(true);
 	}

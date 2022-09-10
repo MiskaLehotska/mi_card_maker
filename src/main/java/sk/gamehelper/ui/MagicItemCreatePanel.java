@@ -207,9 +207,6 @@ public class MagicItemCreatePanel extends JPanel {
 			"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), coinComboBox)
 		);
 
-		// check data -- DELETE THIS
-		System.out.println(data);
-
 		try {
 			magicItemService.createMagicItem(data);
 			JOptionPane.showMessageDialog(this, "A new Magic Item \"" + data.getString("title") 

@@ -3,6 +3,7 @@ package sk.gamehelper.ui;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -14,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import sk.gamehelper.config.AppConfig;
+import sk.gamehelper.helpers.CMap;
 
 public class MainWindow extends JFrame {
 
@@ -52,7 +54,8 @@ public class MainWindow extends JFrame {
 		JMenuItem create = new JMenuItem("Create magic item");
 //		create.addActionListener(e -> System.out.println("I have chosen to create application"));
 		create.addActionListener(e -> {
-			JFrame f = new JFrame();
+			JDialog f = new JDialog(this, "Create Magic Item", true);
+//			JFrame f = new JFrame();
 			f.setSize(555, 680);
 			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			f.setLocationRelativeTo(null);
@@ -60,7 +63,7 @@ public class MainWindow extends JFrame {
 			if (createPanel == null) {
 				try {
 					createPanel = new MagicItemCreatePanel(ImageIO.read(
-							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")));
+							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.CREATE);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

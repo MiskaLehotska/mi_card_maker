@@ -62,6 +62,7 @@ public class MagicItemCreatePanel extends JPanel {
 	private JButton resetButton;
 
 	private Image image;
+	private WindowType type;
 
 	// init enums into the cache
 	static {
@@ -71,9 +72,10 @@ public class MagicItemCreatePanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public MagicItemCreatePanel(Image image) {		
+	public MagicItemCreatePanel(Image image, WindowType type) {		
 		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 		this.image = image;
+		this.type = type;
 		this.validator = new FieldValidator();
 
 		setLayout(null);
@@ -174,7 +176,14 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void initializeButtons() {
-		createButton = createBasicButton("create_button", "CREATE", this::createMagicItemAction);
+		switch (type) {
+		case CREATE:
+			createButton = createBasicButton("create_button", "CREATE", this::createMagicItemAction);
+			break;
+		case UPDATE:
+			createButton = createBasicButton("update_button", "UPDATE", this::updateMagicItemAction);
+			break;
+		}
 		createButton.setBounds(61, 598, 88, 25);
 		add(createButton);
 
@@ -240,6 +249,10 @@ public class MagicItemCreatePanel extends JPanel {
 		}
 	}
 
+	private void updateMagicItemAction(ActionEvent actionEvent) {
+		
+	}
+
 	private void resetFieldsAction(ActionEvent actionEvent) {
 		// clear all the fields and reset options
 		titleField.setText("");
@@ -253,6 +266,16 @@ public class MagicItemCreatePanel extends JPanel {
 
 	public void clear() {
 		this.resetFieldsAction(null);
+	}
+
+	public void initializeValues(CMap map) {
+		titleField.setText(map.getString("title"));
+		priceField.setText(map.getString("price"));
+		descriptionArea.setText(map.getString("description"));
+		categoryComboBox.setSelectedIndex(map.getInteger("category"));
+		rarityComboBox.setSelectedIndex(map.getInteger("rarity"));
+		coinComboBox.setSelectedIndex(map.getInteger("coin"));
+		attunementComboBox.setSelectedIndex(map.getInteger("attunement"));
 	}
 
 	// this will be cached at higher level

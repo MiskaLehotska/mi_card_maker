@@ -24,7 +24,7 @@ public class MainUI {
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				f.setLocationRelativeTo(null);
 				f.add(new MagicItemCreatePanel(ImageIO.read(
-						MainUI.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg"))));
+						MainUI.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.CREATE));
 				f.setVisible(true);
 			} catch (IOException e) {
 				e.printStackTrace();

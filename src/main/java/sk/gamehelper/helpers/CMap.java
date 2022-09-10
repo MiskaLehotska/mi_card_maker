@@ -143,4 +143,8 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 
 		throw new InconvertableTypeException(object, LocalDateTime.class);
 	}
+
+	public Object[] toArray() {
+		return this.values().toArray();
+	}
 }

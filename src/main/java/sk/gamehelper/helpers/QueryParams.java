@@ -30,5 +30,12 @@ public class QueryParams {
 	public Set<Map.Entry<String, Object>> getQueryEntries() {
 		return this.params.entrySet();
 	}
-
+	
+	public String getAsString(String paramName) {
+		return params.getString(paramName);
+	}
+	
+	public Integer getAsInteger(String paramName) {
+		return params.getInteger(paramName);
+	}
 }

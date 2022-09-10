@@ -1,5 +1,10 @@
 package sk.gamehelper.ui;
 
+import static sk.gamehelper.ui.MainWindow.getCategoryEnum;
+import static sk.gamehelper.ui.MainWindow.getCoinEnum;
+import static sk.gamehelper.ui.MainWindow.getEnumIdBySelectedComboBoxValue;
+import static sk.gamehelper.ui.MainWindow.getEnumNames;
+import static sk.gamehelper.ui.MainWindow.getRarityEnum;
 import static sk.gamehelper.ui.SimpleComponentCreator.createBasicButton;
 import static sk.gamehelper.ui.SimpleComponentCreator.createBasicComboBox;
 import static sk.gamehelper.ui.SimpleComponentCreator.createBasicLabel;
@@ -13,8 +18,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -142,27 +145,21 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void initializeComboBoxes() {
-		categoryComboBox = createBasicComboBox("category_options", getEnumNames(MainWindow.getCategoryEnum()));
+		categoryComboBox = createBasicComboBox("category_options", getEnumNames(getCategoryEnum()));
 		categoryComboBox.setBounds(137, 128, 121, 24);
 		add(categoryComboBox);
 
-		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(MainWindow.getRarityEnum()));
+		rarityComboBox = createBasicComboBox("rarity_options", getEnumNames(getRarityEnum()));
 		rarityComboBox.setBounds(137, 165, 121, 24);
 		add(rarityComboBox);
 
-		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(MainWindow.getCoinEnum()));
+		coinComboBox = createBasicComboBox("coin_optinos", getEnumNames(getCoinEnum()));
 		coinComboBox.setBounds(410, 165, 100, 24);
 		add(coinComboBox);
 
 		attunementComboBox = createBasicComboBox("attunement_options", "No", "Yes");
 		attunementComboBox.setBounds(448, 128, 63, 25);
 		add(attunementComboBox);
-	}
-
-	private List<String> getEnumNames(List<CMap> enumList) {
-		return enumList.stream()
-			.map(e -> e.getString("name"))
-			.collect(Collectors.toList());
 	}
 
 	private void initializeButtons() {
@@ -216,14 +213,6 @@ public class MagicItemCreatePanel extends JPanel {
 				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-	}
-
-	private Long getEnumIdBySelectedComboBoxValue(List<CMap> enumList, JComboBox<String> comboBox) {
-		return enumList.stream()
-			.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
-			.map(e -> e.getLong("id"))
-			.findFirst()
-			.get();
 	}
 
 	private void exportAction(ActionEvent actionEvent) {

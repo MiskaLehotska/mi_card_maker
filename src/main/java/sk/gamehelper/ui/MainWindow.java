@@ -1,7 +1,13 @@
 package sk.gamehelper.ui;
 
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -13,18 +19,16 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
 import sk.gamehelper.config.AccessibleContext;
-import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
-import javax.swing.JScrollPane;
-import java.awt.GridLayout;
 
 public class MainWindow {
 
@@ -39,6 +43,12 @@ public class MainWindow {
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
+	private JComboBox<String> comboBox;
+	private JComboBox<String> comboBox_1;
+	private JComboBox<String> comboBox_2;
+	private JComboBox<String> comboBox_3;
+
+	private JTable table;
 	
 	static {
 		loadEnums();
@@ -47,11 +57,15 @@ public class MainWindow {
 	/**
 	 * Create the frame.
 	 * @throws IOException 
+	 * @throws UnsupportedLookAndFeelException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public MainWindow() throws IOException {
+	public MainWindow() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(100, 100, 1080, 600);
+		frame.setBounds(100, 100, 1183, 719);
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Options");
@@ -74,6 +88,7 @@ public class MainWindow {
 			} else {
 				createPanel.clear();
 			}
+			f.setResizable(false);
 			f.add(createPanel);
 			f.setVisible(true);
 		});
@@ -87,29 +102,29 @@ public class MainWindow {
 		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JButton btnOpenForUpdate = new JButton("update");
-		btnOpenForUpdate.addActionListener(e -> {
-				JDialog f = new JDialog(frame, "Update Magic Item", true);
-//				JFrame f = new JFrame();
-				f.setSize(555, 680);
-				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				f.setLocationRelativeTo(null);
-
-				if (updatePanel == null) {
-					try {
-						updatePanel = new MagicItemCreatePanel(ImageIO.read(
-								MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-//				CMap data = new CMap();
-//				updatePanel.initializeValues(data);
-				f.add(updatePanel);
-				f.setVisible(true);
-		});
-		btnOpenForUpdate.setBounds(22, 505, 92, 25);
-		contentPane.add(btnOpenForUpdate);
+//		JButton btnOpenForUpdate = new JButton("update");
+//		btnOpenForUpdate.addActionListener(e -> {
+//				JDialog f = new JDialog(frame, "Update Magic Item", true);
+////				JFrame f = new JFrame();
+//				f.setSize(555, 680);
+//				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//				f.setLocationRelativeTo(null);
+//
+//				if (updatePanel == null) {
+//					try {
+//						updatePanel = new MagicItemCreatePanel(ImageIO.read(
+//								MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
+//					} catch (IOException e1) {
+//						e1.printStackTrace();
+//					}
+//				}
+////				CMap data = new CMap();
+////				updatePanel.initializeValues(data);
+//				f.add(updatePanel);
+//				f.setVisible(true);
+//		});
+//		btnOpenForUpdate.setBounds(22, 505, 92, 25);
+//		contentPane.add(btnOpenForUpdate);
 		
 		textField = new JTextField();
 		textField.setBounds(22, 87, 124, 25);
@@ -121,33 +136,58 @@ public class MainWindow {
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
 		
-		textField_2 = new JTextField();
+		//ZVALIDOVAT ABY NEBOLO FROM VACSIE AKO TO
+		textField_2 = SimpleComponentCreator.createBasicTextField("price_from", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_2.setBounds(22, 138, 124, 25);
+		textField_2.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent keyEvent) {
+				int keyChar = keyEvent.getKeyChar();
+				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
+					textField_2.setEditable(true);
+				} else {
+					textField_2.setEditable(false);
+				}
+			}
+		});
 		contentPane.add(textField_2);
-		textField_2.setColumns(10);
 		
-		textField_3 = new JTextField();
+		textField_3 = SimpleComponentCreator.createBasicTextField("price_to", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_3.setBounds(22, 188, 124, 25);
+		textField_3.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent keyEvent) {
+				int keyChar = keyEvent.getKeyChar();
+				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
+					textField_3.setEditable(true);
+				} else {
+					textField_3.setEditable(false);
+				}
+			}
+		});
 		contentPane.add(textField_3);
-		textField_3.setColumns(10);
-		
-		JComboBox comboBox = new JComboBox();
+
+		List<String> currencyEnumOptions = getEnumNames(coinEnum);
+		currencyEnumOptions.add(0, "");
+		comboBox = SimpleComponentCreator.createBasicComboBox("currency_combo", currencyEnumOptions);
 		comboBox.setBounds(22, 241, 124, 24);
 		contentPane.add(comboBox);
-		
-		JComboBox comboBox_1 = new JComboBox();
+
+		List<String> categoryEnumOptions = getEnumNames(categoryEnum);
+		categoryEnumOptions.add(0, "");
+		comboBox_1 = SimpleComponentCreator.createBasicComboBox("category_combo", categoryEnumOptions);
 		comboBox_1.setBounds(22, 294, 124, 24);
 		contentPane.add(comboBox_1);
 		
-		JComboBox comboBox_2 = new JComboBox();
+		List<String> rarityEnumOptions = getEnumNames(rarityEnum);
+		rarityEnumOptions.add(0, "");
+		comboBox_2 = SimpleComponentCreator.createBasicComboBox("rarity_combo", rarityEnumOptions);
 		comboBox_2.setBounds(22, 344, 124, 24);
 		contentPane.add(comboBox_2);
 		
-		JComboBox comboBox_3 = new JComboBox();
+		comboBox_3 = SimpleComponentCreator.createBasicComboBox("attunement_combo", "", "No", "Yes");
 		comboBox_3.setBounds(22, 395, 124, 24);
 		contentPane.add(comboBox_3);
 		
-		JButton btnNewButton = new JButton("Reset");
+		JButton btnNewButton = SimpleComponentCreator.createBasicButton("resetButton", "RESET", this::resetFieldsAction);
 		btnNewButton.setBounds(22, 468, 92, 25);
 		contentPane.add(btnNewButton);
 		
@@ -186,15 +226,23 @@ public class MainWindow {
 		JLabel lblAttunement = new JLabel("Attunement");
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
-		
+
 		JPanel panel = new JPanel();
-		panel.setBounds(158, 0, 922, 542);
+		panel.setBounds(158, 0, 1025, 661);
 		contentPane.add(panel);
 		panel.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		JScrollPane scrollPane = new JScrollPane();
 		panel.add(scrollPane);
 		
+		table = new JTable(new Object[][] {
+			{"Mjolnir", "This is mjolnir hammer", "Weapon", "Legendary", 456, "Electrum", true}
+		}, new Object[] {
+				"Title", "Description", "Category", "Rarity", "Price", "Currency", "Attunement"
+		});
+		table.setFillsViewportHeight(true);
+		scrollPane.setViewportView(table);
+
 		frame.setVisible(true);
 	}
 
@@ -219,4 +267,31 @@ public class MainWindow {
 	public static List<CMap> getCoinEnum() {
 		return coinEnum;
 	}
+	
+	public static List<String> getEnumNames(List<CMap> enumList) {
+		return enumList.stream()
+			.map(e -> e.getString("name"))
+			.collect(Collectors.toList());
+	}
+
+	public static Long getEnumIdBySelectedComboBoxValue(List<CMap> enumList, JComboBox<String> comboBox) {
+		return enumList.stream()
+			.filter(e -> e.getString("name").equals(comboBox.getSelectedItem()))
+			.map(e -> e.getLong("id"))
+			.findFirst()
+			.get();
+	}
+	
+	private void resetFieldsAction(ActionEvent actionEvent) {
+		// clear all the fields and reset options
+		textField.setText("");
+		textField_1.setText("");
+		textField_2.setText("");
+		textField_3.setText("");
+		comboBox.setSelectedIndex(0);
+		comboBox_1.setSelectedIndex(0);
+		comboBox_2.setSelectedIndex(0);
+		comboBox_3.setSelectedIndex(0);
+	}
+
 }

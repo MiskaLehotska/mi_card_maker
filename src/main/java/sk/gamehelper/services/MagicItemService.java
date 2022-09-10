@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
+import sk.gamehelper.db.DatabaseObject;
 import sk.gamehelper.db.Table;
 import sk.gamehelper.exceptions.RecordAlreadyExists;
 import sk.gamehelper.helpers.CMap;
@@ -38,5 +39,13 @@ public class MagicItemService {
 		if (!itemsWithSameTitle.isEmpty()) {
 			throw new RecordAlreadyExists(MessagesLoader.resolveMessage("magicItemTitleValidation", title));
 		}
+	}
+
+	@Transactional
+	public void updateMagicItem(CMap data) {
+		MagicItem itemToUpdate = new MagicItem();
+		itemToUpdate.setByData(data);
+
+		itemToUpdate.update();
 	}
 }

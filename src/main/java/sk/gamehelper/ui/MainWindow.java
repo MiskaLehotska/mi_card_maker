@@ -24,6 +24,7 @@ import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.EnumService;
 import javax.swing.JScrollPane;
+import java.awt.GridLayout;
 
 public class MainWindow {
 
@@ -186,11 +187,13 @@ public class MainWindow {
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
 		
+		JPanel panel = new JPanel();
+		panel.setBounds(158, 0, 922, 542);
+		contentPane.add(panel);
+		panel.setLayout(new GridLayout(1, 0, 0, 0));
+		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(1057, 525, -895, -517);
-		
-		
-		contentPane.add(scrollPane);
+		panel.add(scrollPane);
 		
 		frame.setVisible(true);
 	}

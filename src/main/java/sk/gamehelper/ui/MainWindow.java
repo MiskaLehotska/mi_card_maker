@@ -1,12 +1,14 @@
 package sk.gamehelper.ui;
 
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +37,7 @@ import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
 
 public class MainWindow {
-
+	private static final Color WHITE = new Color(238, 238, 236);
 	private static List<CMap> categoryEnum;
 	private static List<CMap> rarityEnum;
 	private static List<CMap> coinEnum;
@@ -104,7 +106,23 @@ public class MainWindow {
 		menuBar.add(menu);
 
 		frame.setJMenuBar(menuBar);
-		contentPane = new JPanel();
+		contentPane = new JPanel() {
+			@Override
+			  protected void paintComponent(Graphics g) {
+			    super.paintComponent(g);
+			    Image image = null;
+				try {
+					image = ImageIO.read(
+							MainWindow.class.getClassLoader().getResourceAsStream(
+									"images/background_images/dnd-forest-queen-and-forest-giant-apyjbqbu2g3tn821-apyjbqbu2g3tn821.jpg"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			    // image, x-os, y-os
+			    g.drawImage(image, -130, -160, null);
+			}
+		};
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		frame.setContentPane(contentPane);
@@ -203,35 +221,35 @@ public class MainWindow {
 		btnSearch.setBounds(22, 431, 92, 25);
 		contentPane.add(btnSearch);
 		
-		JLabel lblTitle = new JLabel("Title");
+		JLabel lblTitle = SimpleComponentCreator.createBasicLabel("titleLabel", "Title", WHITE);
 		lblTitle.setBounds(22, 23, 70, 15);
 		contentPane.add(lblTitle);
 		
-		JLabel lblDescription = new JLabel("Description");
+		JLabel lblDescription = SimpleComponentCreator.createBasicLabel("descLabel", "Description", WHITE);
 		lblDescription.setBounds(22, 71, 114, 15);
 		contentPane.add(lblDescription);
 		
-		JLabel lblPriceFrom = new JLabel("Price from");
+		JLabel lblPriceFrom = SimpleComponentCreator.createBasicLabel("priceFromLabel", "Price from", WHITE);
 		lblPriceFrom.setBounds(22, 124, 114, 15);
 		contentPane.add(lblPriceFrom);
 		
-		JLabel lblPriceTo = new JLabel("Price to");
+		JLabel lblPriceTo = SimpleComponentCreator.createBasicLabel("priceToLabel", "Price to", WHITE);
 		lblPriceTo.setBounds(22, 174, 70, 15);
 		contentPane.add(lblPriceTo);
 		
-		JLabel lblCurrency = new JLabel("Currency");
+		JLabel lblCurrency = SimpleComponentCreator.createBasicLabel("currencyLabel", "Currency", WHITE);
 		lblCurrency.setBounds(22, 225, 70, 15);
 		contentPane.add(lblCurrency);
 		
-		JLabel lblCategory = new JLabel("Category");
+		JLabel lblCategory = SimpleComponentCreator.createBasicLabel("categoryLabel", "Category", WHITE);
 		lblCategory.setBounds(22, 277, 70, 15);
 		contentPane.add(lblCategory);
 		
-		JLabel lblRarity = new JLabel("Rarity");
+		JLabel lblRarity = SimpleComponentCreator.createBasicLabel("rarityLabel", "Rarity", WHITE);
 		lblRarity.setBounds(22, 328, 70, 15);
 		contentPane.add(lblRarity);
 		
-		JLabel lblAttunement = new JLabel("Attunement");
+		JLabel lblAttunement = SimpleComponentCreator.createBasicLabel("attunementLabel", "Attunement", WHITE);
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
 

@@ -259,6 +259,12 @@ public class MainWindow {
 		table.getColumnModel().getColumn(2).setPreferredWidth(270);
 
 		table.setFillsViewportHeight(true);
+		
+		// https://stackoverflow.com/questions/3878411/jtable-how-to-add-data-without-displaying
+		// column id can be selected only from model not from table:
+		// Object cellData = table.getModel().getValueAt(...);
+		table.getColumnModel().removeColumn(table.getColumn("ID"));
+
 		scrollPane.setViewportView(table);
 
 //		System.out.println(table.getColumnModel().getColumn(0).getWidth());
@@ -275,11 +281,11 @@ public class MainWindow {
 //		rarityEnum = Collections.emptyList();
 //		coinEnum = Collections.emptyList();
 	}
-	
+
 	public static List<CMap> getCategoryEnum() {
 		return categoryEnum;
 	}
-	
+
 	public static List<CMap> getRarityEnum() {
 		return rarityEnum;
 	}
@@ -326,6 +332,25 @@ public class MainWindow {
 		if (!textField_3.getText().isEmpty())	
 			queryParams.addParam("to", textField_3.getText());
 
+//		System.out.println(comboBox.getSelectedItem());
+//		System.out.println(comboBox.getSelectedIndex());
+
+		if (!((String) comboBox.getSelectedItem()).isEmpty()) {
+			queryParams.addParam("coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, "coin", comboBox));
+		}
+		if (!((String) comboBox_1.getSelectedItem()).isEmpty()) {
+			queryParams.addParam("category_id", getEnumIdBySelectedComboBoxValue(categoryEnum, "category", comboBox_1));
+		}
+		if (!((String) comboBox_2.getSelectedItem()).isEmpty()) {
+			queryParams.addParam("rarity_id", getEnumIdBySelectedComboBoxValue(rarityEnum, "rarity", comboBox_2));
+		}
+		if (!((String) comboBox_3.getSelectedItem()).isEmpty()) {
+			Boolean value = "Yes".equals(comboBox_3.getSelectedItem()) ? true : false;
+			queryParams.addParam("attunement", value);
+		}
+
+		queryParams.getParamNames().forEach(System.out::println);
+
 		List<CMap> data = magicItemService.searchMagicItem(queryParams);
 		setTableData(data);
 	}
@@ -339,11 +364,11 @@ public class MainWindow {
 		// delete all the records
 		dataModel.setRowCount(0);
 		// display new records
-		data.forEach(e -> dataModel.addRow(extractTableRow(e)));
+		data.forEach(e -> dataModel.addRow(getAsTableRow(e)));
 		table.setModel(dataModel);
 	}
 
-	private Object[] extractTableRow(CMap data) {
+	private Object[] getAsTableRow(CMap data) {
 		return new Object[] {
 			data.getLong("id"),
 			data.getString("title"),

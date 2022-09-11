@@ -266,18 +266,31 @@ public class MainWindow {
 		};
 		table = new JTable(new DefaultTableModel(new Object[] {
 				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
-		}, 0));
+		}, 0)) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {                
+                return false;               
+        };
+		};
 
 //		table = new JTable(data, new Object[] {
 //				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
 //		});
 		table.setAutoCreateRowSorter(true);
+
 		// set title and description column lengths
 		table.getColumnModel().getColumn(1).setPreferredWidth(200);
-		table.getColumnModel().getColumn(2).setPreferredWidth(270);
+		table.getColumnModel().getColumn(2).setPreferredWidth(340);
+		table.getColumnModel().getColumn(3).setPreferredWidth(80);
+		table.getColumnModel().getColumn(4).setPreferredWidth(60);
+		table.getColumnModel().getColumn(5).setPreferredWidth(50);
+		table.getColumnModel().getColumn(6).setPreferredWidth(60);
+		table.getColumnModel().getColumn(7).setPreferredWidth(60);
 
 		table.setFillsViewportHeight(true);
-		
+
 		// https://stackoverflow.com/questions/3878411/jtable-how-to-add-data-without-displaying
 		// column id can be selected only from model not from table:
 		// Object cellData = table.getModel().getValueAt(...);

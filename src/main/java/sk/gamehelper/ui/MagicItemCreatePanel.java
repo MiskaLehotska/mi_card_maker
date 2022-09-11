@@ -232,9 +232,26 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void updateMagicItemAction(ActionEvent actionEvent) {
+		try {
+			validator.validateRequiredFields(titleField, priceField, descriptionArea);
+		} catch (RequiredFieldValidationError rfve) {
+			JOptionPane.showMessageDialog(this, rfve.getMessage(), 
+				"Field validation", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
 		CMap updateData = getInputData();
 		updateData.put("id", currentItemId);
-		magicItemService.updateMagicItem(updateData);
+
+		try {
+			magicItemService.updateMagicItem(updateData);
+			JOptionPane.showMessageDialog(this, "Magic Item \"" + updateData.getString("title") 
+			+ "\" has been updated!", "Magic item updated", JOptionPane.INFORMATION_MESSAGE);
+		} catch (RuntimeException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		this.currentItemId = null;
 	}
 

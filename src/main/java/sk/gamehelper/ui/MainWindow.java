@@ -22,6 +22,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -29,6 +30,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
@@ -41,6 +43,10 @@ public class MainWindow {
 	private static List<CMap> categoryEnum;
 	private static List<CMap> rarityEnum;
 	private static List<CMap> coinEnum;
+
+	private List<String> currencyEnumOptions;
+	private List<String> categoryEnumOptions;
+	private List<String> rarityEnumOptions;
 
 	private JPanel contentPane;
 	private MagicItemCreatePanel createPanel;
@@ -191,19 +197,19 @@ public class MainWindow {
 		});
 		contentPane.add(textField_3);
 
-		List<String> currencyEnumOptions = getEnumNames(coinEnum, "coin");
+		currencyEnumOptions = getEnumNames(coinEnum, "coin");
 		currencyEnumOptions.add(0, "");
 		comboBox = SimpleComponentCreator.createBasicComboBox("currency_combo", currencyEnumOptions);
 		comboBox.setBounds(22, 241, 124, 24);
 		contentPane.add(comboBox);
 
-		List<String> categoryEnumOptions = getEnumNames(categoryEnum, "category");
+		categoryEnumOptions = getEnumNames(categoryEnum, "category");
 		categoryEnumOptions.add(0, "");
 		comboBox_1 = SimpleComponentCreator.createBasicComboBox("category_combo", categoryEnumOptions);
 		comboBox_1.setBounds(22, 294, 124, 24);
 		contentPane.add(comboBox_1);
 		
-		List<String> rarityEnumOptions = getEnumNames(rarityEnum, "rarity");
+		rarityEnumOptions = getEnumNames(rarityEnum, "rarity");
 		rarityEnumOptions.add(0, "");
 		comboBox_2 = SimpleComponentCreator.createBasicComboBox("rarity_combo", rarityEnumOptions);
 		comboBox_2.setBounds(22, 344, 124, 24);
@@ -265,14 +271,13 @@ public class MainWindow {
 //			{null, null, null, null, null, null, null}
 		};
 		table = new JTable(new DefaultTableModel(new Object[] {
-				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
-		}, 0)) {
+				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement" }, 0)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public boolean isCellEditable(int row, int column) {                
-                return false;               
-        };
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			};
 		};
 
 //		table = new JTable(data, new Object[] {
@@ -296,11 +301,56 @@ public class MainWindow {
 		// Object cellData = table.getModel().getValueAt(...);
 		table.getColumnModel().removeColumn(table.getColumn("ID"));
 
+		final JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem updateItem = new JMenuItem("Update magic item");
+        updateItem.addActionListener(e -> {
+			JDialog f = new JDialog(frame, "Update Magic Item", true);
+//			JFrame f = new JFrame();
+			f.setSize(555, 680);
+			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			f.setLocationRelativeTo(null);
+
+			if (updatePanel == null) {
+				try {
+					updatePanel = new MagicItemCreatePanel(ImageIO.read(
+							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			CMap tableData = getSelectedRowData();
+			updatePanel.initializeValues(tableData);
+			f.setResizable(false);
+			f.add(updatePanel);
+			f.setVisible(true);
+		});
+        popupMenu.add(updateItem);
+        table.setComponentPopupMenu(popupMenu);
+
 		scrollPane.setViewportView(table);
 
 //		System.out.println(table.getColumnModel().getColumn(0).getWidth());
 		
 		frame.setVisible(true);
+	}
+
+	private CMap getSelectedRowData() {
+		CMap data = new CMap();
+		// if -1, no row is selected
+		int row = table.getSelectedRow();
+		TableModel model = table.getModel();
+
+		data.put("id", Long.valueOf(model.getValueAt(row, 0).toString()));
+		System.out.println(Long.valueOf(model.getValueAt(row, 0).toString()));
+		data.put("title", model.getValueAt(row, 1));
+		data.put("description", model.getValueAt(row, 2));
+		data.put("category", categoryEnumOptions.indexOf(model.getValueAt(row, 3)) - 1);
+		data.put("rarity", rarityEnumOptions.indexOf(model.getValueAt(row, 4)) - 1);
+		data.put("price", model.getValueAt(row, 5));//integer?
+		data.put("coin", currencyEnumOptions.indexOf(model.getValueAt(row, 6)) - 1);
+		data.put("attunement", "true".equals(model.getValueAt(row, 7).toString()) ? 1 : 0);
+
+		return data;
 	}
 
 	private static void loadEnums() {

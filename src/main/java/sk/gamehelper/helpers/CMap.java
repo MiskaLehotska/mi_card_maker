@@ -74,10 +74,9 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 		Object object = this.get(key);
 		if (object == null) {
 			return null;
-		} else if (object instanceof String) {
-			return (String) object;
+		} else {
+			return String.valueOf(object);
 		}
-		throw new InconvertableTypeException(object, String.class);
 	}
 
 	public UUID getUUID(String key) {

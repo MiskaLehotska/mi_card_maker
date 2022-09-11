@@ -59,6 +59,8 @@ public class MagicItemCreatePanel extends JPanel {
 	private JButton exportButton;
 	private JButton resetButton;
 
+	private Long currentItemId;
+
 	private Image image;
 	private WindowType type;
 
@@ -194,15 +196,7 @@ public class MagicItemCreatePanel extends JPanel {
 		}
 
 		// gather values, resolve and prepare insert data
-		CMap data = new CMap(
-			"title", titleField.getText(),
-			"description", descriptionArea.getText(),
-			"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
-			"price", Integer.valueOf(priceField.getText()),
-			"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), "category", categoryComboBox),
-			"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), "rarity", rarityComboBox),
-			"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), "coin", coinComboBox)
-		);
+		CMap data = getInputData();
 
 		try {
 			magicItemService.createMagicItem(data);
@@ -213,6 +207,18 @@ public class MagicItemCreatePanel extends JPanel {
 				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+	}
+
+	private CMap getInputData() {
+		return new CMap(
+				"title", titleField.getText(),
+				"description", descriptionArea.getText(),
+				"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
+				"price", Integer.valueOf(priceField.getText()),
+				"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), "category", categoryComboBox),
+				"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), "rarity", rarityComboBox),
+				"coin_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCoinEnum(), "coin", coinComboBox)
+			);
 	}
 
 	private void exportAction(ActionEvent actionEvent) {
@@ -226,7 +232,10 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	private void updateMagicItemAction(ActionEvent actionEvent) {
-		
+		CMap updateData = getInputData();
+		updateData.put("id", currentItemId);
+		magicItemService.updateMagicItem(updateData);
+		this.currentItemId = null;
 	}
 
 	private void resetFieldsAction(ActionEvent actionEvent) {
@@ -245,6 +254,7 @@ public class MagicItemCreatePanel extends JPanel {
 	}
 
 	public void initializeValues(CMap map) {
+		currentItemId = map.getLong("id");
 		titleField.setText(map.getString("title"));
 		priceField.setText(map.getString("price"));
 		descriptionArea.setText(map.getString("description"));

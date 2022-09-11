@@ -48,6 +48,12 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 			return null;
 		} else if (object instanceof Integer) {
 			return (Integer) object;
+		} else if (object instanceof CharSequence) {
+			try {
+				return Integer.parseInt(object.toString());
+			} catch (NumberFormatException nfe) {
+				// do nothing
+			}
 		}
 		throw new InconvertableTypeException(object, Integer.class);
 	}

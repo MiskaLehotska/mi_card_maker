@@ -43,4 +43,8 @@ public class QueryParams {
 		return params.isEmpty();
 	}
 
+	public void renameParam (String oldParamName, String newParamName) {
+		Object value = this.params.remove(oldParamName);
+		params.put(newParamName, value);
+	}
 }

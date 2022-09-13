@@ -26,14 +26,12 @@ public class MagicItemService {
 	public void createMagicItem(CMap data) {
 		MagicItem mi = new MagicItem();
 		mi.setByData(data);
-		validateTitle(mi);
+		validateTitle(mi.getTitle());
 
 		mi.insert();
 	}
 
-	// Tato metoda moze zobrat nejaky
-	private void validateTitle(MagicItem item) {
-		String title = item.getTitle();
+	private void validateTitle(String title) {
 		List<CMap> itemsWithSameTitle = db.select("s_title")
 			.from(Table.MAGIC_ITEM)
 			.where("s_title", title)
@@ -44,30 +42,45 @@ public class MagicItemService {
 		}
 	}
 
-	// TODO:
-	// ak robim update na rovnakom zazname na UI, lebo som si nedal refresh, tak mi to dokaze urobit update
-	// 2 krat na tom istom uz teraz neplatnom zazname... to je neziaduce.. na UI to opravim, ale tu treba
-	// dorobit to, ze ked idem updatnut tento zaznam, musi byt podla idcka validny...ak nie je, znamena to,
-	// ze nemozem updatnut stary, neplatny zaznam.. a to by malo vyhodit chybu..
-
-	// tak isto by som skontroloval pred tym, ze ci mi vobec dojde ID-cko ...po setByData() mozes zavoat getId()
-	// ak ti to da null, tak hod chybu, ze je to povinne pole pre update
-	// na taketo chyby co je tu alebo vyssie mozu byt kludne aj nejake spravy tahane z messages.properties, to
-	// je ale na tebe ako to poriesis..
-
-	// dalej, tu by som tiez pouzil uz existujucu validaciu na titulok, pokial aktualny titulok, co chcem zmenit 
-	// je iny ako ten pred tym... 
-	// stary titulok, co bude zmeneny si vies getnut z databazy podla ID zaznamu co ti dojde na vstupe a novy si vies po
-	// volani setByData() uz priamo vypytat z modelu metodou getTitle() ...to je titulok, na ktory to chceme
-	// zmenit... a len v tom pripade, ze je tento titulok iny ako to co je tam povodne, validujem tento novy
-	// titulok.. inak nie, pretoze stary titulok moze ostat aj pri update (mozem menit len description), no ak
-	// zmenim titulok, nesmiem pridat titulok, ktory uz existuje
 	@Transactional
 	public void updateMagicItem(CMap data) {
-		MagicItem itemToUpdate = new MagicItem();
-		itemToUpdate.setByData(data);
+		MagicItem itemToUpdate = new MagicItem().setByData(data);
+		String newTitle = itemToUpdate.getTitle();
+		Long id = itemToUpdate.getId();
+
+		validateIdPresence(id);
+		checkForInvalidId(id);
+		validateTitleForUpdate(newTitle, id);
 
 		itemToUpdate.update();
+	}
+
+	private void validateIdPresence(Long id) {
+		if (id == null) {
+			throw new IllegalStateException(MessagesLoader.resolveMessage("missingIdParameter"));
+		}
+	}
+
+	private void checkForInvalidId(Long id) {
+		Long invalidId = db.select("n_id")
+			.from(Table.MAGIC_ITEM)
+			.where("n_id", id)
+			.asLong();
+
+		if (invalidId == null) {
+			throw new IllegalStateException(MessagesLoader.resolveMessage("updateInvalidRecord"));
+		}
+	}
+
+	private void validateTitleForUpdate(String currentTitle, Long id) {
+		String oldTitle = db.select("s_title")
+			.from(Table.MAGIC_ITEM)
+			.where("n_id", id)
+			.asString();
+
+		if (!currentTitle.equals(oldTitle)) {
+			validateTitle(currentTitle);
+		}
 	}
 
 	public List<CMap> searchMagicItem(QueryParams params) {

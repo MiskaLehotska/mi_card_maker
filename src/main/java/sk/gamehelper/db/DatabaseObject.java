@@ -95,11 +95,8 @@ public abstract class DatabaseObject<T> {
 	}
 
 	public void update() {
-		// invalidate record with current ID
-		String updateStatement = constructUpdateStatement();
-		logger.info(updateStatement);
-		jdbcTemplate.update(updateStatement);
-
+		// invalidate existing record
+		delete();
 		// insert new record with new data and ID
 		insert();
 	}
@@ -120,6 +117,12 @@ public abstract class DatabaseObject<T> {
 		update.append(data.getLong(identifier));
 
 		return update.toString();
+	}
+
+	public void delete() {
+		String updateStatement = constructUpdateStatement();
+		logger.info(updateStatement);
+		jdbcTemplate.update(updateStatement);
 	}
 
 	private Timestamp getCurrentTimestamp() {

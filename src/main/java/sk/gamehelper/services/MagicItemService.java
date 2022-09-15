@@ -93,9 +93,18 @@ public class MagicItemService {
 		params.removeParam("to");
 		validatePriceRange(priceFrom, priceTo);
 
-		Select select = db.select("A.n_id, A.s_title", "A.s_description", "A.n_price", 
-				"A.b_attunement", "A.d_from", "A.d_to", "A.t_write", "B.s_category_name",
-				"C.s_rarity_name", "D.s_coin_name")
+		Select select = db.select(
+				"A.n_id",
+				"A.s_title",
+				"A.s_description",
+				"A.n_price",
+				"A.b_attunement",
+				"A.d_from",
+				"A.d_to",
+				"A.t_write",
+				"B.s_category_name",
+				"C.s_rarity_name",
+				"D.s_coin_name")
 			.from("v_magic_item A")
 			.join("ve_category B")
 			.on("A.n_category_id", "B.n_id")
@@ -139,5 +148,12 @@ public class MagicItemService {
 				throw new IllegalArgumentException(MessagesLoader.resolveMessage("priceValidation", from, to));
 			}
 		}
-	}	
+	}
+
+	public void deleteMagicItem(CMap data) {
+		MagicItem item = new MagicItem().setByData(data);
+		validateIdPresence(item.getId());
+
+		item.delete();
+	}
 }

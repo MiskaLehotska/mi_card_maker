@@ -283,7 +283,8 @@ public class MainWindow {
 //		table = new JTable(data, new Object[] {
 //				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
 //		});
-		table.setAutoCreateRowSorter(true);
+
+//		table.setAutoCreateRowSorter(true);
 
 		// set title and description column lengths
 		table.getColumnModel().getColumn(1).setPreferredWidth(200);
@@ -324,7 +325,14 @@ public class MainWindow {
 			f.add(updatePanel);
 			f.setVisible(true);
 		});
+        JMenuItem deleteItem = new JMenuItem("Delete magic item");
+        deleteItem.addActionListener(e -> {
+        	// throw confirmation dialog before delete
+        	magicItemService.deleteMagicItem(getSelectedRowData());
+        	System.out.println("deleting magic item with id: " + getSelectedRowData().getLong("id"));
+        });
         popupMenu.add(updateItem);
+        popupMenu.add(deleteItem);
         table.setComponentPopupMenu(popupMenu);
 
 		scrollPane.setViewportView(table);
@@ -439,9 +447,9 @@ public class MainWindow {
 	private void setTableData(List<CMap> data) {
 		DefaultTableModel dataModel = (DefaultTableModel) table.getModel();
 		// iterate over columns and get the whole row into cmap ... pre-populate the values in update window and if triggered, send even ID of the current magic item
-		if (table.getSelectedRow() != -1) {
-			System.out.println(table.getValueAt(table.getSelectedRow(), 0)); // getID
-		}
+//		if (table.getSelectedRow() != -1) {
+//			System.out.println(table.getValueAt(table.getSelectedRow(), 0)); // getID
+//		}
 		// delete all the records
 		dataModel.setRowCount(0);
 		// display new records

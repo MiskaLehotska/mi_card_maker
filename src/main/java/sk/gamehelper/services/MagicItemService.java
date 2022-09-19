@@ -1,10 +1,23 @@
 package sk.gamehelper.services;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
@@ -13,6 +26,7 @@ import sk.gamehelper.db.Select;
 import sk.gamehelper.db.Table;
 import sk.gamehelper.exceptions.RecordAlreadyExists;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.FormatType;
 import sk.gamehelper.helpers.MessagesLoader;
 import sk.gamehelper.helpers.QueryParams;
 
@@ -150,10 +164,60 @@ public class MagicItemService {
 		}
 	}
 
+	@Transactional
 	public void deleteMagicItem(CMap data) {
 		MagicItem item = new MagicItem().setByData(data);
 		validateIdPresence(item.getId());
 
 		item.delete();
+	}
+
+	public void exportToFile(QueryParams queryParams, String absolutePath, FormatType formatType) {
+		validateFormatType(formatType);		
+		List<CMap> data = searchMagicItem(queryParams);
+		File file = createFile(absolutePath, formatType);
+
+		switch(formatType) {
+		case JSON: 
+			exportToJsonFile(data, file);
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void validateFormatType(FormatType formatType) {
+		switch (formatType) {
+		case EXCEL:
+		case JSON:
+		case CSV:
+		case XML:
+			return;
+		default:
+			throw new IllegalArgumentException("Illegal format type");
+		}
+	}
+
+	private File createFile(String absolutePath, FormatType formatType) {
+		StringBuilder fullName = new StringBuilder();
+		fullName.append("magic_items_export_");
+		fullName.append(LocalDate.now());
+		fullName.append(formatType.getSuffix());
+
+		return new File(absolutePath, fullName.toString());
+	}
+
+	private void exportToJsonFile(List<CMap> data, File file) {
+		Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.create();
+
+		try {
+			Writer fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			gson.toJson(data, fileWriter);
+			fileWriter.flush();
+		} catch (JsonIOException | IOException e) {
+			throw new RuntimeException("error converting data to json");
+		}
 	}
 }

@@ -61,9 +61,21 @@ public class MainWindow {
 	private JComboBox<String> comboBox_1;
 	private JComboBox<String> comboBox_2;
 	private JComboBox<String> comboBox_3;
-
+	private JButton btnNewButton;
+	private JButton btnSearch;
+	private JLabel lblTitle;
+	private JLabel lblDescription;
+	private JLabel lblPriceFrom;
+	private JLabel lblPriceTo;
+	private JLabel lblCurrency;
+	private JLabel lblCategory;
+	private JLabel lblRarity;
+	private JLabel lblAttunement;
+	private JPanel panel;
+	private JScrollPane scrollPane;
 	private MagicItemService magicItemService;
-
+	private final JPopupMenu popupMenu = new JPopupMenu();
+    private JMenuItem updateItem;
 	private JTable table;
 
 	static {
@@ -221,52 +233,52 @@ public class MainWindow {
 		comboBox_3.setBounds(22, 395, 124, 24);
 		contentPane.add(comboBox_3);
 		
-		JButton btnNewButton = SimpleComponentCreator.createBasicButton("resetButton", "RESET", this::resetFieldsAction);
+		btnNewButton = SimpleComponentCreator.createBasicButton("resetButton", "RESET", this::resetFieldsAction);
 		btnNewButton.setBounds(22, 468, 92, 25);
 		contentPane.add(btnNewButton);
 		
-		JButton btnSearch = SimpleComponentCreator.createBasicButton("searchButton", "SEARCH", this::searchDataAction);
+		btnSearch = SimpleComponentCreator.createBasicButton("searchButton", "SEARCH", this::searchDataAction);
 		btnSearch.setBounds(22, 431, 92, 25);
 		contentPane.add(btnSearch);
-		
-		JLabel lblTitle = SimpleComponentCreator.createBasicLabel("titleLabel", "Title", WHITE);
+
+		lblTitle = SimpleComponentCreator.createBasicLabel("titleLabel", "Title", WHITE);
 		lblTitle.setBounds(22, 23, 70, 15);
 		contentPane.add(lblTitle);
 		
-		JLabel lblDescription = SimpleComponentCreator.createBasicLabel("descLabel", "Description", WHITE);
+		lblDescription = SimpleComponentCreator.createBasicLabel("descLabel", "Description", WHITE);
 		lblDescription.setBounds(22, 71, 114, 15);
 		contentPane.add(lblDescription);
 		
-		JLabel lblPriceFrom = SimpleComponentCreator.createBasicLabel("priceFromLabel", "Price from", WHITE);
+		lblPriceFrom = SimpleComponentCreator.createBasicLabel("priceFromLabel", "Price from", WHITE);
 		lblPriceFrom.setBounds(22, 124, 114, 15);
 		contentPane.add(lblPriceFrom);
 		
-		JLabel lblPriceTo = SimpleComponentCreator.createBasicLabel("priceToLabel", "Price to", WHITE);
+		lblPriceTo = SimpleComponentCreator.createBasicLabel("priceToLabel", "Price to", WHITE);
 		lblPriceTo.setBounds(22, 174, 70, 15);
 		contentPane.add(lblPriceTo);
 		
-		JLabel lblCurrency = SimpleComponentCreator.createBasicLabel("currencyLabel", "Currency", WHITE);
+		lblCurrency = SimpleComponentCreator.createBasicLabel("currencyLabel", "Currency", WHITE);
 		lblCurrency.setBounds(22, 225, 70, 15);
 		contentPane.add(lblCurrency);
 		
-		JLabel lblCategory = SimpleComponentCreator.createBasicLabel("categoryLabel", "Category", WHITE);
+		lblCategory = SimpleComponentCreator.createBasicLabel("categoryLabel", "Category", WHITE);
 		lblCategory.setBounds(22, 277, 70, 15);
 		contentPane.add(lblCategory);
 		
-		JLabel lblRarity = SimpleComponentCreator.createBasicLabel("rarityLabel", "Rarity", WHITE);
+		lblRarity = SimpleComponentCreator.createBasicLabel("rarityLabel", "Rarity", WHITE);
 		lblRarity.setBounds(22, 328, 70, 15);
 		contentPane.add(lblRarity);
 		
-		JLabel lblAttunement = SimpleComponentCreator.createBasicLabel("attunementLabel", "Attunement", WHITE);
+		lblAttunement = SimpleComponentCreator.createBasicLabel("attunementLabel", "Attunement", WHITE);
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setBounds(158, 0, 1025, 661);
 		contentPane.add(panel);
 		panel.setLayout(new GridLayout(1, 0, 0, 0));
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		panel.add(scrollPane);
 
 		Object[][] data = new Object[][] {
@@ -305,8 +317,7 @@ public class MainWindow {
 		// Object cellData = table.getModel().getValueAt(...);
 		table.getColumnModel().removeColumn(table.getColumn("ID"));
 
-		final JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem updateItem = new JMenuItem("Update magic item");
+        updateItem = new JMenuItem("Update magic item");
         updateItem.addActionListener(e -> {
 			JDialog f = new JDialog(frame, "Update Magic Item", true);
 //			JFrame f = new JFrame();
@@ -332,7 +343,7 @@ public class MainWindow {
         deleteItem.addActionListener(e -> {
         	// throw confirmation dialog before delete
 			CMap deletedMagicItem = getSelectedRowData();
-			int selection = JOptionPane.showConfirmDialog(table, "Magic item \"" + deletedMagicItem.getString("title") + "\"", "Delete magic item", JOptionPane.YES_NO_OPTION);
+			int selection = JOptionPane.showConfirmDialog(frame, "Magic item \"" + deletedMagicItem.getString("title") + "\"", "Delete magic item", JOptionPane.YES_NO_OPTION);
 			switch (selection) {
 			case JOptionPane.YES_OPTION:
 				magicItemService.deleteMagicItem(deletedMagicItem);

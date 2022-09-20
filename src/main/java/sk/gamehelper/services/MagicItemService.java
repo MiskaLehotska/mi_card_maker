@@ -4,14 +4,21 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
+import sk.gamehelper.config.AppConfig;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
@@ -181,6 +189,9 @@ public class MagicItemService {
 		case JSON: 
 			exportToJsonFile(data, file);
 			break;
+		case CSV:
+			exportToCsvFile(data, file);
+			break;
 		default:
 			break;
 		}
@@ -220,11 +231,32 @@ public class MagicItemService {
 			throw new RuntimeException("error converting data to json");
 		}
 	}
-	
-	// exportToCsvFile()
-	//
-	// do suboru sa zapisu hodnoty oddelene bodkociarkou
-	// iba prvy riadok suboru bude obsahovat kluce/nazov stlpca, ktore budu tiez oddelene bodkociarkou
-	// ked sa zapise jeden zaznam, jeho posledny stlpec nekonci bodkociarkou ale znakom konca riadka
-	// treba si pozriet ked tak v knihe, ze pri pouziti akej triedy treba/netreba dat ten flush(), alebo to po kazdom riadku jednoducho zavolat
+
+	private void exportToCsvFile(List<CMap> data, File file) {
+		String headers [] = new String[]{"Title", "Category", "Rarity", "Price", "Coin", "Attunement", "Description"};
+		String csvSeparator = ";";
+
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+			writer.write(Arrays.stream(headers).collect(Collectors.joining(";")));
+			writer.newLine();
+			writer.flush();
+
+			for (CMap oneData : data) {
+				StringBuffer oneLine = new StringBuffer();
+				oneLine.append(oneData.getString("title")).append(csvSeparator);
+				oneLine.append(oneData.getString("category_name")).append(csvSeparator);
+				oneLine.append(oneData.getString("rarity_name")).append(csvSeparator);
+				oneLine.append(oneData.getInteger("price")).append(csvSeparator);
+				oneLine.append(oneData.getString("coin_name")).append(csvSeparator);
+				oneLine.append(oneData.getBoolean("attunement")).append(csvSeparator);
+				oneLine.append(oneData.getString("description")).append(csvSeparator);
+
+				writer.write(oneLine.toString());
+				writer.newLine();
+				writer.flush();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

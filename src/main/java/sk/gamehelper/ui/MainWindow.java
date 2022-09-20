@@ -21,11 +21,13 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
@@ -296,6 +298,7 @@ public class MainWindow {
 		table.getColumnModel().getColumn(7).setPreferredWidth(60);
 
 		table.setFillsViewportHeight(true);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// https://stackoverflow.com/questions/3878411/jtable-how-to-add-data-without-displaying
 		// column id can be selected only from model not from table:
@@ -328,9 +331,15 @@ public class MainWindow {
         JMenuItem deleteItem = new JMenuItem("Delete magic item");
         deleteItem.addActionListener(e -> {
         	// throw confirmation dialog before delete
-        	magicItemService.deleteMagicItem(getSelectedRowData());
-        	System.out.println("deleting magic item with id: " + getSelectedRowData().getLong("id"));
-        });
+			CMap deletedMagicItem = getSelectedRowData();
+			int selection = JOptionPane.showConfirmDialog(table, "Magic item \"" + deletedMagicItem.getString("title") + "\"", "Delete magic item", JOptionPane.YES_NO_OPTION);
+			switch (selection) {
+			case JOptionPane.YES_OPTION:
+				magicItemService.deleteMagicItem(deletedMagicItem);
+			default:
+				break;
+			}
+		});
         popupMenu.add(updateItem);
         popupMenu.add(deleteItem);
         table.setComponentPopupMenu(popupMenu);
@@ -349,7 +358,6 @@ public class MainWindow {
 		TableModel model = table.getModel();
 
 		data.put("id", Long.valueOf(model.getValueAt(row, 0).toString()));
-		System.out.println(Long.valueOf(model.getValueAt(row, 0).toString()));
 		data.put("title", model.getValueAt(row, 1));
 		data.put("description", model.getValueAt(row, 2));
 		data.put("category", categoryEnumOptions.indexOf(model.getValueAt(row, 3)) - 1);
@@ -407,7 +415,6 @@ public class MainWindow {
 		comboBox_1.setSelectedIndex(0);
 		comboBox_2.setSelectedIndex(0);
 		comboBox_3.setSelectedIndex(0);
-		// TODO: reset chosen sort column
 	}
 
 	private void searchDataAction(ActionEvent actionEvent) {

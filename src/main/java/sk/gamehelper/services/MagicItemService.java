@@ -220,4 +220,11 @@ public class MagicItemService {
 			throw new RuntimeException("error converting data to json");
 		}
 	}
+	
+	// exportToCsvFile()
+	//
+	// do suboru sa zapisu hodnoty oddelene bodkociarkou
+	// iba prvy riadok suboru bude obsahovat kluce/nazov stlpca, ktore budu tiez oddelene bodkociarkou
+	// ked sa zapise jeden zaznam, jeho posledny stlpec nekonci bodkociarkou ale znakom konca riadka
+	// treba si pozriet ked tak v knihe, ze pri pouziti akej triedy treba/netreba dat ten flush(), alebo to po kazdom riadku jednoducho zavolat
 }

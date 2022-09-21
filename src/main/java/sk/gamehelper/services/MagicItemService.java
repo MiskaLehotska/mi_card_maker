@@ -1,24 +1,26 @@
 package sk.gamehelper.services;
 
+import java.awt.Desktop;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +28,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
-import sk.gamehelper.config.AppConfig;
+import net.sf.jett.transform.ExcelTransformer;
 import sk.gamehelper.dao.MagicItem;
 import sk.gamehelper.db.Database;
 import sk.gamehelper.db.QueryOperator;
@@ -40,6 +42,8 @@ import sk.gamehelper.helpers.QueryParams;
 
 @Component
 public class MagicItemService {
+
+	private static final String EXPORT_TEMPLATE = "template.xlsx";
 
 	@Autowired
 	private Database db;
@@ -192,6 +196,9 @@ public class MagicItemService {
 		case CSV:
 			exportToCsvFile(data, file);
 			break;
+		case EXCEL:
+			exportToExcelFile(data, file);
+			break;
 		default:
 			break;
 		}
@@ -259,4 +266,17 @@ public class MagicItemService {
 			e.printStackTrace();
 		}
 	}
+
+	private void exportToExcelFile(List<CMap> data, File file) {
+		ExcelTransformer transformer = new ExcelTransformer();
+		Map<String, Object> dataToExport = new HashMap<>();
+		dataToExport.put("table", data);
+		try {
+			InputStream inputStream = MagicItemService.class.getClassLoader().getResourceAsStream(EXPORT_TEMPLATE);
+			Workbook workbook = transformer.transform(inputStream, dataToExport);
+			workbook.write(new BufferedOutputStream(new FileOutputStream(file)));
+		} catch (InvalidFormatException | IOException e) {
+			e.printStackTrace();
+		}		
+	}	
 }

@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -36,6 +38,7 @@ import javax.swing.table.TableModel;
 
 import sk.gamehelper.config.AccessibleContext;
 import sk.gamehelper.helpers.CMap;
+import sk.gamehelper.helpers.FormatType;
 import sk.gamehelper.helpers.QueryParams;
 import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
@@ -61,8 +64,10 @@ public class MainWindow {
 	private JComboBox<String> comboBox_1;
 	private JComboBox<String> comboBox_2;
 	private JComboBox<String> comboBox_3;
+	private JComboBox<String> exportComboBox;
 	private JButton btnNewButton;
 	private JButton btnSearch;
+	private JButton exportButton;
 	private JLabel lblTitle;
 	private JLabel lblDescription;
 	private JLabel lblPriceFrom;
@@ -81,6 +86,8 @@ public class MainWindow {
 
 	private JFrame frame;
 
+	private final String[] exportOptions = {"excel", "csv", "json", "xml"};
+	
 	static {
 		loadEnums();
 	}
@@ -276,10 +283,15 @@ public class MainWindow {
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
 
+		exportComboBox = SimpleComponentCreator.createBasicComboBox("exportComboBox", exportOptions);
+		exportButton = SimpleComponentCreator.createBasicButton("exportButton", "Export table", this::exportAction);
+		exportButton.setBounds(22, 615, 110, 25);
+		contentPane.add(exportButton);
+
 		recordCounter = SimpleComponentCreator.createBasicLabel("recordCounterLabel", "Records: 0", WHITE);
 		recordCounter.setBounds(30, 640, 110, 20);
 		contentPane.add(recordCounter);
-		
+
 		panel = new JPanel();
 		panel.setBounds(158, 0, 1025, 661);
 		contentPane.add(panel);
@@ -436,6 +448,19 @@ public class MainWindow {
 	}
 
 	private void searchDataAction(ActionEvent actionEvent) {
+		QueryParams queryParams = getValuesAsQueryParams();
+		queryParams.getParamNames().forEach(System.out::println);
+
+		try {
+			List<CMap> data = magicItemService.searchMagicItem(queryParams);
+			setTableData(data);
+			recordCounter.setText("Records: " + data.size());
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(frame, ex.getMessage(), "Search error", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+	
+	private QueryParams getValuesAsQueryParams() {
 		QueryParams queryParams = new QueryParams();
 		if (!textField.getText().isEmpty())
 			queryParams.addParam("description", textField.getText());
@@ -462,16 +487,7 @@ public class MainWindow {
 			Boolean value = "Yes".equals(comboBox_3.getSelectedItem()) ? true : false;
 			queryParams.addParam("attunement", value);
 		}
-
-		queryParams.getParamNames().forEach(System.out::println);
-
-		try {
-			List<CMap> data = magicItemService.searchMagicItem(queryParams);
-			setTableData(data);
-			recordCounter.setText("Records: " + data.size());
-		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(frame, ex.getMessage(), "Search error", JOptionPane.WARNING_MESSAGE);
-		}
+		return queryParams;
 	}
 
 	private void setTableData(List<CMap> data) {
@@ -500,4 +516,29 @@ public class MainWindow {
 		};
 	}
 
+	private void exportAction(ActionEvent actionEvent) {
+		int format = JOptionPane.showConfirmDialog(frame, exportComboBox, "Choose output format", JOptionPane.DEFAULT_OPTION);
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int option = fileChooser.showOpenDialog(frame);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			magicItemService.exportToFile(getValuesAsQueryParams(), file.getAbsolutePath(), resolveFormat(format));
+		}
+	}
+
+	private FormatType resolveFormat(int format) {
+		switch (format) {
+		case 0:
+			return FormatType.EXCEL;
+		case 1:
+			return FormatType.CSV;
+		case 2:
+			return FormatType.JSON;
+		case 3:
+			return FormatType.XML;
+		default:
+			return null;
+		}
+	}
 }

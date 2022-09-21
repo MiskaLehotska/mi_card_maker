@@ -71,12 +71,15 @@ public class MainWindow {
 	private JLabel lblCategory;
 	private JLabel lblRarity;
 	private JLabel lblAttunement;
+	private JLabel recordCounter;
 	private JPanel panel;
 	private JScrollPane scrollPane;
 	private MagicItemService magicItemService;
 	private final JPopupMenu popupMenu = new JPopupMenu();
     private JMenuItem updateItem;
 	private JTable table;
+
+	private JFrame frame;
 
 	static {
 		loadEnums();
@@ -93,7 +96,7 @@ public class MainWindow {
 	public MainWindow() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 1183, 719);
 
@@ -273,6 +276,10 @@ public class MainWindow {
 		lblAttunement.setBounds(22, 380, 92, 15);
 		contentPane.add(lblAttunement);
 
+		recordCounter = SimpleComponentCreator.createBasicLabel("recordCounterLabel", "Records: 0", WHITE);
+		recordCounter.setBounds(30, 640, 110, 20);
+		contentPane.add(recordCounter);
+		
 		panel = new JPanel();
 		panel.setBounds(158, 0, 1025, 661);
 		contentPane.add(panel);
@@ -458,8 +465,13 @@ public class MainWindow {
 
 		queryParams.getParamNames().forEach(System.out::println);
 
-		List<CMap> data = magicItemService.searchMagicItem(queryParams);
-		setTableData(data);
+		try {
+			List<CMap> data = magicItemService.searchMagicItem(queryParams);
+			setTableData(data);
+			recordCounter.setText("Records: " + data.size());
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(frame, ex.getMessage(), "Search error", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 
 	private void setTableData(List<CMap> data) {

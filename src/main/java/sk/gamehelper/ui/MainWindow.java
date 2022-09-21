@@ -517,7 +517,8 @@ public class MainWindow {
 	}
 
 	private void exportAction(ActionEvent actionEvent) {
-		int format = JOptionPane.showConfirmDialog(frame, exportComboBox, "Choose output format", JOptionPane.DEFAULT_OPTION);
+		JOptionPane.showConfirmDialog(frame, exportComboBox, "Choose output format", JOptionPane.DEFAULT_OPTION);
+		int format = exportComboBox.getSelectedIndex();
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int option = fileChooser.showOpenDialog(frame);

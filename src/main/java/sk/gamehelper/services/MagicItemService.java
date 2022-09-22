@@ -1,6 +1,5 @@
 package sk.gamehelper.services;
 
-import java.awt.Desktop;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.thoughtworks.xstream.XStream;
 
 import net.sf.jett.transform.ExcelTransformer;
 import sk.gamehelper.dao.MagicItem;
@@ -37,6 +36,8 @@ import sk.gamehelper.db.Table;
 import sk.gamehelper.exceptions.RecordAlreadyExists;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.helpers.FormatType;
+import sk.gamehelper.helpers.MagicItemDTO;
+import sk.gamehelper.helpers.MagicItemXmlWrapper;
 import sk.gamehelper.helpers.MessagesLoader;
 import sk.gamehelper.helpers.QueryParams;
 
@@ -88,10 +89,7 @@ public class MagicItemService {
 	}
 
 	private void checkForInvalidId(Long id) {
-		Long invalidId = db.select("n_id")
-			.from(Table.MAGIC_ITEM)
-			.where("n_id", id)
-			.asLong();
+		Long invalidId = db.select("n_id").from(Table.MAGIC_ITEM).where("n_id", id).asLong();
 
 		if (invalidId == null) {
 			throw new IllegalStateException(MessagesLoader.resolveMessage("updateInvalidRecord"));
@@ -115,12 +113,12 @@ public class MagicItemService {
 
 		Integer priceFrom = params.getAsInteger("from");
 		params.removeParam("from");
-		Integer priceTo =  params.getAsInteger("to");
+		Integer priceTo = params.getAsInteger("to");
 		params.removeParam("to");
 		validatePriceRange(priceFrom, priceTo);
 
 		Select select = db.select(
-				"A.n_id",
+				"A.n_id", 
 				"A.s_title",
 				"A.s_description",
 				"A.n_price",
@@ -145,12 +143,11 @@ public class MagicItemService {
 		applyWhereStatement("A.n_price", QueryOperator.GREATER_THAN_EQUAL, priceFrom, select);
 		applyWhereStatement("A.n_price", QueryOperator.LESS_THAN_EQUAL, priceTo, select);
 
-		return select.where(params)
-			.asList();
+		return select.where(params).asList();
 	}
 
 	private void validateParamSize(QueryParams params) {
-		if(params.isEmpty()) {
+		if (params.isEmpty()) {
 			throw new IllegalArgumentException(MessagesLoader.resolveMessage("missingParam"));
 		}
 	}
@@ -185,12 +182,12 @@ public class MagicItemService {
 	}
 
 	public void exportToFile(QueryParams queryParams, String absolutePath, FormatType formatType) {
-		validateFormatType(formatType);		
+		validateFormatType(formatType);
 		List<CMap> data = searchMagicItem(queryParams);
 		File file = createFile(absolutePath, formatType);
 
-		switch(formatType) {
-		case JSON: 
+		switch (formatType) {
+		case JSON:
 			exportToJsonFile(data, file);
 			break;
 		case CSV:
@@ -199,6 +196,8 @@ public class MagicItemService {
 		case EXCEL:
 			exportToExcelFile(data, file);
 			break;
+		case XML:
+			exportToXmlFile(data, file);
 		default:
 			break;
 		}
@@ -226,9 +225,7 @@ public class MagicItemService {
 	}
 
 	private void exportToJsonFile(List<CMap> data, File file) {
-		Gson gson = new GsonBuilder()
-			.setPrettyPrinting()
-			.create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		try {
 			Writer fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
@@ -240,7 +237,7 @@ public class MagicItemService {
 	}
 
 	private void exportToCsvFile(List<CMap> data, File file) {
-		String headers [] = new String[]{"Title", "Category", "Rarity", "Price", "Coin", "Attunement", "Description"};
+		String headers[] = new String[] { "Title", "Category", "Rarity", "Price", "Coin", "Attunement", "Description" };
 		String csvSeparator = ";";
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -277,6 +274,22 @@ public class MagicItemService {
 			workbook.write(new BufferedOutputStream(new FileOutputStream(file)));
 		} catch (InvalidFormatException | IOException e) {
 			e.printStackTrace();
-		}		
-	}	
+		}
+	}
+
+	private void exportToXmlFile(List<CMap> data, File file) {
+		XStream xstream = new XStream();
+		xstream.alias("magicItem", MagicItemDTO.class);
+		xstream.alias("magicItems", MagicItemXmlWrapper.class);
+
+		xstream.addImplicitCollection(MagicItemXmlWrapper.class, "data");
+		String xml = xstream.toXML(new MagicItemXmlWrapper(data));
+
+		try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
+			writer.write(xml);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

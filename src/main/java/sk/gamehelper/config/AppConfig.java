@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 
 @ComponentScan(basePackages = "sk.gamehelper")
 @PropertySource("classpath:/db/connection.properties")
@@ -36,11 +37,24 @@ public class AppConfig {
 			@Value("${db.username}") String username, 
 			@Value("${db.password}") String password) {
 
-		SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
+//		ComboPooledDataSource dataSource = new ComboPooledDataSource();
+//		dataSource.setUser(username);
+//		dataSource.setPassword(password);
+//		dataSource.setJdbcUrl(url);
+//		dataSource.setMaxPoolSize(2);
+//		dataSource.setMinPoolSize(1);
+//		
+//		System.out.println(dataSource.getMaxConnectionAge());
+//		System.out.println(dataSource.getMaxIdleTime());
+//		System.out.println(dataSource.getMaxStatements());
+//		System.out.println(dataSource.getMaxStatementsPerConnection());
+		
+		MysqlConnectionPoolDataSource dataSource = new MysqlConnectionPoolDataSource();
 		dataSource.setUrl(url);
-		dataSource.setUsername(username);
+		dataSource.setUser(username);
 		dataSource.setPassword(password);
 
 		return dataSource;
+//		return connectionPool;
 	}
 }

@@ -37,17 +37,6 @@ public class AppConfig {
 			@Value("${db.username}") String username, 
 			@Value("${db.password}") String password) {
 
-//		ComboPooledDataSource dataSource = new ComboPooledDataSource();
-//		dataSource.setUser(username);
-//		dataSource.setPassword(password);
-//		dataSource.setJdbcUrl(url);
-//		dataSource.setMaxPoolSize(2);
-//		dataSource.setMinPoolSize(1);
-//		
-//		System.out.println(dataSource.getMaxConnectionAge());
-//		System.out.println(dataSource.getMaxIdleTime());
-//		System.out.println(dataSource.getMaxStatements());
-//		System.out.println(dataSource.getMaxStatementsPerConnection());
 		
 		MysqlConnectionPoolDataSource dataSource = new MysqlConnectionPoolDataSource();
 		dataSource.setUrl(url);
@@ -55,6 +44,5 @@ public class AppConfig {
 		dataSource.setPassword(password);
 
 		return dataSource;
-//		return connectionPool;
 	}
 }

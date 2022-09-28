@@ -1,5 +1,12 @@
 package sk.gamehelper.config;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Logger;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +21,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 
+import sk.gamehelper.helpers.MessagesLoader;
+
 @ComponentScan(basePackages = "sk.gamehelper")
 @PropertySource("classpath:/db/connection.properties")
 @EnableTransactionManagement
 public class AppConfig {
+
+	private static final Logger LOGGER = Logger.getAnonymousLogger();
 
 	@Bean
 	@Autowired
@@ -45,4 +56,27 @@ public class AppConfig {
 
 		return dataSource;
 	}
+
+	@Bean
+	public Font getCardFont() {
+		InputStream inputStream = AppConfig.class.getClassLoader().getResourceAsStream("fonts/calligraphy/CalligraphyFLF.ttf");
+		Font font = null;
+		try {
+			font = Font.createFont(Font.PLAIN, inputStream);
+		} catch (FontFormatException | IOException e) {
+			LOGGER.severe(e.getMessage());
+			throw new RuntimeException("Unable to load card font");
+		}
+		GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		boolean isRegistered = environment.registerFont(font);
+
+		if(isRegistered) {
+			LOGGER.info(MessagesLoader.resolveMessage("fontRegistration", font.getFontName()));
+		} else {
+			LOGGER.warning("The font: " + font.getFontName() + " could not be registered within graphics environment.");
+		}
+
+		return font;
+	}
+
 }

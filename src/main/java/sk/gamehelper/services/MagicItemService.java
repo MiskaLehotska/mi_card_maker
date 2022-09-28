@@ -1,5 +1,6 @@
 package sk.gamehelper.services;
 
+import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,6 +49,9 @@ public class MagicItemService {
 
 	@Autowired
 	private Database db;
+
+	@Autowired
+	private Font cardFont;
 
 	@Transactional
 	public void createMagicItem(CMap data) {

@@ -112,9 +112,6 @@ public class MagicItemService {
 	}
 
 	public List<CMap> searchMagicItem(QueryParams params) {
-//		we are testing large amount of data 
-//		validateParamSize(params);
-
 		Integer priceFrom = params.getAsInteger("from");
 		params.removeParam("from");
 		Integer priceTo = params.getAsInteger("to");
@@ -148,12 +145,6 @@ public class MagicItemService {
 		applyWhereStatement("A.n_price", QueryOperator.LESS_THAN_EQUAL, priceTo, select);
 
 		return select.where(params).asList();
-	}
-
-	private void validateParamSize(QueryParams params) {
-		if (params.isEmpty()) {
-			throw new IllegalArgumentException(MessagesLoader.resolveMessage("missingParam"));
-		}
 	}
 
 	private void applyWhereStatement(String columnName, QueryOperator operator, Object value, Select select) {

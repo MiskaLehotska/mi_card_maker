@@ -269,10 +269,6 @@ public final class Select {
 
 		try {
 			return jdbcTemplate.query(selectBuilder.toString(), cMapRowMapper);
-//			return jdbcTemplate.queryForList(selectBuilder.toString())
-//				.stream()
-//				.map(CMap::new)
-//				.collect(toList());
 		} catch (DataAccessException dae) {
 			return Collections.emptyList();
 		}

@@ -111,10 +111,8 @@ public class MainWindow {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Options");
 		JMenuItem create = new JMenuItem("Create magic item");
-//		create.addActionListener(e -> System.out.println("I have chosen to create application"));
 		create.addActionListener(e -> {
 			JDialog f = new JDialog(frame, "Create Magic Item", true);
-//			JFrame f = new JFrame();
 			f.setSize(555, 680);
 			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			f.setLocationRelativeTo(null);
@@ -147,7 +145,6 @@ public class MainWindow {
 							MainWindow.class.getClassLoader().getResourceAsStream(
 									"images/background_images/dnd-forest-queen-and-forest-giant-apyjbqbu2g3tn821-apyjbqbu2g3tn821.jpg"));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			    // image, x-os, y-os
@@ -158,30 +155,6 @@ public class MainWindow {
 
 		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-//		JButton btnOpenForUpdate = new JButton("update");
-//		btnOpenForUpdate.addActionListener(e -> {
-//				JDialog f = new JDialog(frame, "Update Magic Item", true);
-////				JFrame f = new JFrame();
-//				f.setSize(555, 680);
-//				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//				f.setLocationRelativeTo(null);
-//
-//				if (updatePanel == null) {
-//					try {
-//						updatePanel = new MagicItemCreatePanel(ImageIO.read(
-//								MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
-//					} catch (IOException e1) {
-//						e1.printStackTrace();
-//					}
-//				}
-////				CMap data = new CMap();
-////				updatePanel.initializeValues(data);
-//				f.add(updatePanel);
-//				f.setVisible(true);
-//		});
-//		btnOpenForUpdate.setBounds(22, 505, 92, 25);
-//		contentPane.add(btnOpenForUpdate);
 		
 		textField = new JTextField();
 		textField.setBounds(22, 87, 124, 25);
@@ -301,9 +274,6 @@ public class MainWindow {
 		scrollPane = new JScrollPane();
 		panel.add(scrollPane);
 
-		Object[][] data = new Object[][] {
-//			{null, null, null, null, null, null, null}
-		};
 		table = new JTable(new DefaultTableModel(new Object[] {
 				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement" }, 0)) {
 			private static final long serialVersionUID = 1L;
@@ -313,12 +283,6 @@ public class MainWindow {
 				return false;
 			};
 		};
-
-//		table = new JTable(data, new Object[] {
-//				"Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement"
-//		});
-
-//		table.setAutoCreateRowSorter(true);
 
 		// set title and description column lengths
 		table.getColumnModel().getColumn(1).setPreferredWidth(200);
@@ -334,13 +298,11 @@ public class MainWindow {
 
 		// https://stackoverflow.com/questions/3878411/jtable-how-to-add-data-without-displaying
 		// column id can be selected only from model not from table:
-		// Object cellData = table.getModel().getValueAt(...);
 		table.getColumnModel().removeColumn(table.getColumn("ID"));
 
         updateItem = new JMenuItem("Update magic item");
         updateItem.addActionListener(e -> {
 			JDialog f = new JDialog(frame, "Update Magic Item", true);
-//			JFrame f = new JFrame();
 			f.setSize(555, 680);
 			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			f.setLocationRelativeTo(null);
@@ -378,8 +340,6 @@ public class MainWindow {
 
 		scrollPane.setViewportView(table);
 
-//		System.out.println(table.getColumnModel().getColumn(0).getWidth());
-		
 		frame.setVisible(true);
 	}
 
@@ -406,9 +366,6 @@ public class MainWindow {
 		categoryEnum = enumService.getCategoryEnum();
 		rarityEnum = enumService.getRarityEnum();
 		coinEnum = enumService.getCoinEnum();
-//		categoryEnum = Collections.emptyList();
-//		rarityEnum = Collections.emptyList();
-//		coinEnum = Collections.emptyList();
 	}
 
 	public static List<CMap> getCategoryEnum() {
@@ -473,9 +430,6 @@ public class MainWindow {
 		if (!textField_3.getText().isEmpty())	
 			queryParams.addParam("to", textField_3.getText());
 
-//		System.out.println(comboBox.getSelectedItem());
-//		System.out.println(comboBox.getSelectedIndex());
-
 		if (!((String) comboBox.getSelectedItem()).isEmpty()) {
 			queryParams.addParam("coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, "coin", comboBox));
 		}
@@ -494,10 +448,6 @@ public class MainWindow {
 
 	private void setTableData(List<CMap> data) {
 		DefaultTableModel dataModel = (DefaultTableModel) table.getModel();
-		// iterate over columns and get the whole row into cmap ... pre-populate the values in update window and if triggered, send even ID of the current magic item
-//		if (table.getSelectedRow() != -1) {
-//			System.out.println(table.getValueAt(table.getSelectedRow(), 0)); // getID
-//		}
 		// delete all the records
 		dataModel.setRowCount(0);
 		// display new records

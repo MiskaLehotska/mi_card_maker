@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -45,6 +46,7 @@ import sk.gamehelper.helpers.QueryParams;
 @Component
 public class MagicItemService {
 
+	private static final Logger LOGGER = Logger.getAnonymousLogger();
 	private static final String EXPORT_TEMPLATE = "template.xlsx";
 
 	@Autowired
@@ -254,7 +256,7 @@ public class MagicItemService {
 				writer.flush();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.severe(() -> e.getMessage());
 		}
 	}
 
@@ -267,7 +269,7 @@ public class MagicItemService {
 			Workbook workbook = transformer.transform(inputStream, dataToExport);
 			workbook.write(new BufferedOutputStream(new FileOutputStream(file)));
 		} catch (InvalidFormatException | IOException e) {
-			e.printStackTrace();
+			LOGGER.severe(() -> e.getMessage());
 		}
 	}
 
@@ -283,7 +285,7 @@ public class MagicItemService {
 			writer.write(xml);
 			writer.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.severe(() -> e.getMessage());
 		}
 	}
 }

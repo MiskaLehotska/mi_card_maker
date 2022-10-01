@@ -202,6 +202,7 @@ public class MagicItemService {
 			break;
 		case XML:
 			exportToXmlFile(data, file);
+			break;	
 		default:
 			break;
 		}

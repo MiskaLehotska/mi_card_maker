@@ -366,6 +366,7 @@ public class MainWindow {
 			switch (selection) {
 			case JOptionPane.YES_OPTION:
 				magicItemService.deleteMagicItem(deletedMagicItem);
+				break;
 			default:
 				break;
 			}

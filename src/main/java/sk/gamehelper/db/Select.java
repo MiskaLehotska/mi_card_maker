@@ -176,7 +176,7 @@ public final class Select {
 
 	public class Join {
 
-		static final String JOIN = " JOIN ";
+		static final String INNER_JOIN = " JOIN ";
 		static final String INNER = " INNER";
 		static final String LEFT = " LEFT";
 		static final String RIGHT = " RIGHT";
@@ -189,7 +189,7 @@ public final class Select {
 
 		public Join(String table, String joinType) {
 			selectBuilder.append(joinType);
-			selectBuilder.append(JOIN);
+			selectBuilder.append(INNER_JOIN);
 			selectBuilder.append(table);
 		}
 
@@ -334,7 +334,7 @@ public final class Select {
 	}
 
 	private static void logSelect(CharSequence select) {
-		logger.info("executing: " + select);
+		logger.info(() -> "executing: " + select);
 	}
 
 	@Override

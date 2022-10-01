@@ -7,4 +7,7 @@ public class Table {
 	public static final String CATEGORY_ENUM = "ve_category";
 	public static final String MAGIC_ITEM = "v_magic_item";
 
+	private Table() {
+		throw new IllegalStateException("This class was not designed to be instantiated");
+	}
 }

@@ -161,10 +161,8 @@ public class MagicItemService {
 	}
 
 	private void validatePriceRange(Integer from, Integer to) {
-		if (from != null && to != null) {
-			if (from > to) {
-				throw new IllegalArgumentException(MessagesLoader.resolveMessage("priceValidation", from, to));
-			}
+		if (from != null && to != null && from > to) {
+			throw new IllegalArgumentException(MessagesLoader.resolveMessage("priceValidation", from, to));
 		}
 	}
 
@@ -233,7 +231,7 @@ public class MagicItemService {
 	}
 
 	private void exportToCsvFile(List<CMap> data, File file) {
-		String headers[] = new String[] { "Title", "Category", "Rarity", "Price", "Coin", "Attunement", "Description" };
+		String[] headers = new String[] { "Title", "Category", "Rarity", "Price", "Coin", "Attunement", "Description" };
 		String csvSeparator = ";";
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -242,7 +240,7 @@ public class MagicItemService {
 			writer.flush();
 
 			for (CMap oneData : data) {
-				StringBuffer oneLine = new StringBuffer();
+				StringBuilder oneLine = new StringBuilder();
 				oneLine.append(oneData.getString("title")).append(csvSeparator);
 				oneLine.append(oneData.getString("category_name")).append(csvSeparator);
 				oneLine.append(oneData.getString("rarity_name")).append(csvSeparator);

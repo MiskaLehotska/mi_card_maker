@@ -41,9 +41,9 @@ class AppConfigTest {
 		String actualPassword = dataSource.getPassword();
 		String actualURL = dataSource.getUrl();
 
-		Assertions.assertTrue("postgres".equals(actualUsername), "username should be postgres but was " + actualUsername);
-		Assertions.assertTrue("postgres".equals(actualPassword), "password should be pwd but was " + actualPassword);
-		Assertions.assertTrue("jdbc:postgresql://localhost:5432/dd".equals(actualURL));
+		Assertions.assertEquals("postgres", actualUsername, "username should be postgres but was " + actualUsername);
+		Assertions.assertEquals("postgres", actualPassword, "password should be pwd but was " + actualPassword);
+		Assertions.assertEquals("jdbc:postgresql://localhost:5432/dd", actualURL);
 	}
 
 	@DisplayName("DB JdbcTemplate initialization")

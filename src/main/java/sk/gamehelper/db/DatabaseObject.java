@@ -24,7 +24,7 @@ public abstract class DatabaseObject<T> {
 	private Database database;
 	private JdbcTemplate jdbcTemplate;
 
-	public DatabaseObject() {
+	protected DatabaseObject() {
 		this.database = AccessibleContext.getBean(Database.class);
 		this.jdbcTemplate = AccessibleContext.getBean(JdbcTemplate.class);
 	}

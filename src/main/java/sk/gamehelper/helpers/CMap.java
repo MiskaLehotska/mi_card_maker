@@ -109,7 +109,7 @@ public class CMap extends LinkedCaseInsensitiveMap<Object> {
 			try {
 				return Boolean.parseBoolean(key);
 			} catch (IllegalArgumentException e) {
-
+				// proper exception will be thrown at the bottom
 			}
 		} else if (object instanceof Integer) {
 			if ((Integer) object == 1) {

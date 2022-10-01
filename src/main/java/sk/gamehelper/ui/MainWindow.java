@@ -170,6 +170,7 @@ public class MainWindow {
 		textField_2 = SimpleComponentCreator.createBasicTextField("price_from", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_2.setBounds(22, 138, 124, 25);
 		textField_2.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent keyEvent) {
 				int keyChar = keyEvent.getKeyChar();
 				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
@@ -184,6 +185,7 @@ public class MainWindow {
 		textField_3 = SimpleComponentCreator.createBasicTextField("price_to", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_3.setBounds(22, 188, 124, 25);
 		textField_3.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent keyEvent) {
 				int keyChar = keyEvent.getKeyChar();
 				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
@@ -281,7 +283,7 @@ public class MainWindow {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
-			};
+			}
 		};
 
 		// set title and description column lengths
@@ -391,7 +393,7 @@ public class MainWindow {
 			.filter(e -> e.getString(enumName + "_name").equals(comboBox.getSelectedItem()))
 			.map(e -> e.getLong("id"))
 			.findFirst()
-			.get();
+			.orElse(null);
 	}
 
 	private void resetFieldsAction(ActionEvent actionEvent) {
@@ -408,7 +410,6 @@ public class MainWindow {
 
 	private void searchDataAction(ActionEvent actionEvent) {
 		QueryParams queryParams = getValuesAsQueryParams();
-		queryParams.getParamNames().forEach(System.out::println);
 
 		try {
 			List<CMap> data = magicItemService.searchMagicItem(queryParams);
@@ -440,7 +441,7 @@ public class MainWindow {
 			queryParams.addParam("rarity_id", getEnumIdBySelectedComboBoxValue(rarityEnum, "rarity", comboBox_2));
 		}
 		if (!((String) comboBox_3.getSelectedItem()).isEmpty()) {
-			Boolean value = "Yes".equals(comboBox_3.getSelectedItem()) ? true : false;
+			Boolean value = "Yes".equals(comboBox_3.getSelectedItem());
 			queryParams.addParam("attunement", value);
 		}
 		return queryParams;

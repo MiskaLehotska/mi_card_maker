@@ -2,7 +2,7 @@ package sk.gamehelper.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.IntPredicate;
 
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
@@ -37,7 +37,7 @@ public class FieldValidator {
 		}
 	}
 
-	public void validateIntegerFieldValue(JTextField field, Predicate<Integer> condition, String conditionErrorMessage) {
+	public void validateIntegerFieldValue(JTextField field, IntPredicate condition, String conditionErrorMessage) {
 		try {
 			boolean conditionResult = condition.test(Integer.parseInt(field.getText()));
 			if (!conditionResult) {

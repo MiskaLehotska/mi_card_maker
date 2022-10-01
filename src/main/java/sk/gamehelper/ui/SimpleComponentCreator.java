@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -22,6 +21,10 @@ import org.springframework.lang.Nullable;
  * from outside of this factory class.
  */
 public class SimpleComponentCreator {
+	
+	private SimpleComponentCreator() {
+		throw new IllegalArgumentException("This class was not designed to be instantiated");
+	}
 
 	public static JLabel createBasicLabel(String labelName, String text, Color foreground) {
 		return createBasicLabel(labelName, text, foreground, null);

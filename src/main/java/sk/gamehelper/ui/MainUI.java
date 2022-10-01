@@ -18,7 +18,7 @@ public class MainUI {
 				AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 				context.registerShutdownHook();
 
-				MainWindow frame = new MainWindow();
+				new MainWindow();
 
 			} catch (Exception e) {
 				e.printStackTrace();

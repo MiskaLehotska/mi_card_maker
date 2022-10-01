@@ -128,6 +128,7 @@ public class MagicItemCreatePanel extends JPanel {
 		priceField = createBasicTextField("price", DIALOG_PLAIN_14, SwingConstants.RIGHT, 10);
 		priceField.setBounds(336, 165, 70, 25);
 		priceField.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent keyEvent) {
 				int keyChar = keyEvent.getKeyChar();
 				if ((keyChar == KeyEvent.VK_BACK_SPACE || keyChar == KeyEvent.VK_DELETE) || (keyChar <= '9' && keyChar >= '0')) {
@@ -205,7 +206,6 @@ public class MagicItemCreatePanel extends JPanel {
 		} catch (RuntimeException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(),
 				"Invalid magic item", JOptionPane.ERROR_MESSAGE);
-			return;
 		}
 	}
 
@@ -213,7 +213,7 @@ public class MagicItemCreatePanel extends JPanel {
 		return new CMap(
 				"title", titleField.getText(),
 				"description", descriptionArea.getText(),
-				"attunement", "Yes".equals(attunementComboBox.getSelectedItem()) ? true : false,
+				"attunement", "Yes".equals(attunementComboBox.getSelectedItem()),
 				"price", Integer.valueOf(priceField.getText()),
 				"category_id", getEnumIdBySelectedComboBoxValue(MainWindow.getCategoryEnum(), "category", categoryComboBox),
 				"rarity_id", getEnumIdBySelectedComboBoxValue(MainWindow.getRarityEnum(), "rarity", rarityComboBox),
@@ -227,7 +227,6 @@ public class MagicItemCreatePanel extends JPanel {
 		} catch (RequiredFieldValidationError rfve) {
 			JOptionPane.showMessageDialog(this, rfve.getMessage(),
 				"Field validation", JOptionPane.WARNING_MESSAGE);
-			return;
 		}
 	}
 

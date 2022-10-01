@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -104,7 +105,7 @@ public class MainWindow {
 		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 
 		frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 1183, 719);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -115,7 +116,7 @@ public class MainWindow {
 			JDialog f = new JDialog(frame, "Create Magic Item", true);
 //			JFrame f = new JFrame();
 			f.setSize(555, 680);
-			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			f.setLocationRelativeTo(null);
 
 			if (createPanel == null) {
@@ -341,7 +342,7 @@ public class MainWindow {
 			JDialog f = new JDialog(frame, "Update Magic Item", true);
 //			JFrame f = new JFrame();
 			f.setSize(555, 680);
-			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			f.setLocationRelativeTo(null);
 
 			if (updatePanel == null) {

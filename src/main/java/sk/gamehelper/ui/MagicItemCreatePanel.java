@@ -40,8 +40,8 @@ public class MagicItemCreatePanel extends JPanel {
 	private static final Color WHITE = new Color(238, 238, 236);
 	private static final Font DIALOG_PLAIN_14 = new Font("Dialog", Font.PLAIN, 14);
 
-	private MagicItemService magicItemService;
-	private FieldValidator validator;
+	private transient MagicItemService magicItemService;
+	private transient FieldValidator validator;
 	private JLabel titleLabel;
 	private JLabel categoryLabel;
 	private JLabel rarityLabel;
@@ -61,7 +61,7 @@ public class MagicItemCreatePanel extends JPanel {
 
 	private Long currentItemId;
 
-	private Image image;
+	private transient Image image;
 	private WindowType type;
 
 	/**
@@ -125,7 +125,7 @@ public class MagicItemCreatePanel extends JPanel {
 		titleField.setBounds(50, 56, 460, 37);
 		add(titleField);
 
-		priceField = createBasicTextField("price", DIALOG_PLAIN_14, JTextField.RIGHT, 10);
+		priceField = createBasicTextField("price", DIALOG_PLAIN_14, SwingConstants.RIGHT, 10);
 		priceField.setBounds(336, 165, 70, 25);
 		priceField.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent keyEvent) {

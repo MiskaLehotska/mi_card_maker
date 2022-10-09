@@ -44,6 +44,11 @@ import sk.gamehelper.helpers.QueryParams;
 import sk.gamehelper.services.EnumService;
 import sk.gamehelper.services.MagicItemService;
 
+/**
+ * Dufam, ze uz v zivote nanapisem takyto sajrajt
+ * Dufam, ze uz v zivote nebudem musiet pisat GUI
+ * @author martin
+ */
 public class MainWindow {
 	private static final Color WHITE = new Color(238, 238, 236);
 	private static List<CMap> categoryEnum;
@@ -55,8 +60,8 @@ public class MainWindow {
 	private List<String> rarityEnumOptions;
 
 	private JPanel contentPane;
-	private MagicItemCreatePanel createPanel;
-	private MagicItemCreatePanel updatePanel;
+	private MagicItemPanel createPanel;
+	private MagicItemPanel updatePanel;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
@@ -84,6 +89,7 @@ public class MainWindow {
 	private final JPopupMenu popupMenu = new JPopupMenu();
     private JMenuItem updateItem;
 	private JTable table;
+	private JMenuItem deleteItem;
 
 	private JFrame frame;
 
@@ -111,31 +117,14 @@ public class MainWindow {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Options");
 		JMenuItem create = new JMenuItem("Create magic item");
-		create.addActionListener(e -> {
-			JDialog f = new JDialog(frame, "Create Magic Item", true);
-			f.setSize(555, 680);
-			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			f.setLocationRelativeTo(null);
-
-			if (createPanel == null) {
-				try {
-					createPanel = new MagicItemCreatePanel(ImageIO.read(
-							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.CREATE);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			} else {
-				createPanel.clear();
-			}
-			f.setResizable(false);
-			f.add(createPanel);
-			f.setVisible(true);
-		});
+		create.addActionListener(this::windowedCreateAction);
 		menu.add(create);
 		menuBar.add(menu);
 
 		frame.setJMenuBar(menuBar);
 		contentPane = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			  protected void paintComponent(Graphics g) {
 			    super.paintComponent(g);
@@ -152,21 +141,144 @@ public class MainWindow {
 			}
 		};
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(null);
+		initializeComponents();
 
 		frame.setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
+
+		panel = new JPanel();
+		panel.setBounds(158, 0, 1025, 661);
+		panel.setLayout(new GridLayout(1, 0, 0, 0));
+		scrollPane = new JScrollPane();
+		panel.add(scrollPane);
+
+		contentPane.add(panel);
+
+        updateItem = new JMenuItem("Update magic item");
+        updateItem.addActionListener(this::windowedUpdateAction);
+
+        deleteItem = new JMenuItem("Delete magic item");
+        deleteItem.addActionListener(this::deleteAction);
+
+        initializeScrollableTableWithMenu();
+
+        popupMenu.add(updateItem);
+        popupMenu.add(deleteItem);
+
+		frame.setVisible(true);
+	}
+
+	private void windowedCreateAction(ActionEvent event) {
+		JDialog f = new JDialog(frame, "Create Magic Item", true);
+		f.setSize(555, 680);
+		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		f.setLocationRelativeTo(null);
+
+		if (createPanel == null) {
+			try {
+				createPanel = new MagicItemPanel(ImageIO.read(
+						MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.CREATE);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} else {
+			createPanel.clear();
+		}
+		f.setResizable(false);
+		f.add(createPanel);
+		f.setVisible(true);
+	}
+
+	private void windowedUpdateAction(ActionEvent event) {
+		JDialog f = new JDialog(frame, "Update Magic Item", true);
+		f.setSize(555, 680);
+		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		f.setLocationRelativeTo(null);
+
+		if (updatePanel == null) {
+			try {
+				updatePanel = new MagicItemPanel(ImageIO.read(
+						MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		CMap tableData = getSelectedRowData();
+		updatePanel.initializeValues(tableData);
+		f.setResizable(false);
+		f.add(updatePanel);
+		f.setVisible(true);
+	}
+
+	private void deleteAction(ActionEvent event) {
+		// throw confirmation dialog before delete
+		CMap deletedMagicItem = getSelectedRowData();
+		int selection = JOptionPane.showConfirmDialog(frame, "Delete \"" + deletedMagicItem.getString("title") + "\" ?", "Delete magic item", JOptionPane.YES_NO_OPTION);
+		switch (selection) {
+		case JOptionPane.YES_OPTION:
+			magicItemService.deleteMagicItem(deletedMagicItem);
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void initializeComponents() {
+		initializeLabels();
+		initializeTextFields();
+		initializeComboBoxes();
+		initializeButtons();
+	}
+
+	private void initializeLabels() {
+		lblTitle = SimpleComponentCreator.createBasicLabel("titleLabel", "Title", WHITE);
+		lblTitle.setBounds(22, 23, 70, 15);
+		contentPane.add(lblTitle);
+
+		lblDescription = SimpleComponentCreator.createBasicLabel("descLabel", "Description", WHITE);
+		lblDescription.setBounds(22, 71, 114, 15);
+		contentPane.add(lblDescription);
+
+		lblPriceFrom = SimpleComponentCreator.createBasicLabel("priceFromLabel", "Price from", WHITE);
+		lblPriceFrom.setBounds(22, 124, 114, 15);
+		contentPane.add(lblPriceFrom);
+
+		lblPriceTo = SimpleComponentCreator.createBasicLabel("priceToLabel", "Price to", WHITE);
+		lblPriceTo.setBounds(22, 174, 70, 15);
+		contentPane.add(lblPriceTo);
+
+		lblCurrency = SimpleComponentCreator.createBasicLabel("currencyLabel", "Currency", WHITE);
+		lblCurrency.setBounds(22, 225, 70, 15);
+		contentPane.add(lblCurrency);
+
+		lblCategory = SimpleComponentCreator.createBasicLabel("categoryLabel", "Category", WHITE);
+		lblCategory.setBounds(22, 277, 70, 15);
+		contentPane.add(lblCategory);
+
+		lblRarity = SimpleComponentCreator.createBasicLabel("rarityLabel", "Rarity", WHITE);
+		lblRarity.setBounds(22, 328, 70, 15);
+		contentPane.add(lblRarity);
+
+		lblAttunement = SimpleComponentCreator.createBasicLabel("attunementLabel", "Attunement", WHITE);
+		lblAttunement.setBounds(22, 380, 92, 15);
+		contentPane.add(lblAttunement);
+
+		recordCounter = SimpleComponentCreator.createBasicLabel("recordCounterLabel", "Records: 0", WHITE);
+		recordCounter.setBounds(30, 640, 110, 20);
+		contentPane.add(recordCounter);
+	}
+
+	public void initializeTextFields() {
 		textField = new JTextField();
 		textField.setBounds(22, 87, 124, 25);
 		contentPane.add(textField);
 		textField.setColumns(10);
-		
+
 		textField_1 = new JTextField();
 		textField_1.setBounds(22, 39, 124, 25);
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
-		
-		//ZVALIDOVAT ABY NEBOLO FROM VACSIE AKO TO
+
 		textField_2 = SimpleComponentCreator.createBasicTextField("price_from", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_2.setBounds(22, 138, 124, 25);
 		textField_2.addKeyListener(new KeyAdapter() {
@@ -181,7 +293,7 @@ public class MainWindow {
 			}
 		});
 		contentPane.add(textField_2);
-		
+
 		textField_3 = SimpleComponentCreator.createBasicTextField("price_to", new Font("Arial", Font.PLAIN, 12), SwingConstants.CENTER, 10);
 		textField_3.setBounds(22, 188, 124, 25);
 		textField_3.addKeyListener(new KeyAdapter() {
@@ -196,7 +308,9 @@ public class MainWindow {
 			}
 		});
 		contentPane.add(textField_3);
+	}
 
+	private void initializeComboBoxes() {
 		currencyEnumOptions = getEnumNames(coinEnum, "coin");
 		currencyEnumOptions.add(0, "");
 		comboBox = SimpleComponentCreator.createBasicComboBox("currency_combo", currencyEnumOptions);
@@ -218,7 +332,11 @@ public class MainWindow {
 		comboBox_3 = SimpleComponentCreator.createBasicComboBox("attunement_combo", "", "No", "Yes");
 		comboBox_3.setBounds(22, 395, 124, 24);
 		contentPane.add(comboBox_3);
-		
+
+		exportComboBox = SimpleComponentCreator.createBasicComboBox("exportComboBox", exportOptions);
+	}
+
+	private void initializeButtons() {
 		btnNewButton = SimpleComponentCreator.createBasicButton("resetButton", "RESET", this::resetFieldsAction);
 		btnNewButton.setBounds(22, 468, 92, 25);
 		contentPane.add(btnNewButton);
@@ -227,55 +345,12 @@ public class MainWindow {
 		btnSearch.setBounds(22, 431, 92, 25);
 		contentPane.add(btnSearch);
 
-		lblTitle = SimpleComponentCreator.createBasicLabel("titleLabel", "Title", WHITE);
-		lblTitle.setBounds(22, 23, 70, 15);
-		contentPane.add(lblTitle);
-		
-		lblDescription = SimpleComponentCreator.createBasicLabel("descLabel", "Description", WHITE);
-		lblDescription.setBounds(22, 71, 114, 15);
-		contentPane.add(lblDescription);
-		
-		lblPriceFrom = SimpleComponentCreator.createBasicLabel("priceFromLabel", "Price from", WHITE);
-		lblPriceFrom.setBounds(22, 124, 114, 15);
-		contentPane.add(lblPriceFrom);
-		
-		lblPriceTo = SimpleComponentCreator.createBasicLabel("priceToLabel", "Price to", WHITE);
-		lblPriceTo.setBounds(22, 174, 70, 15);
-		contentPane.add(lblPriceTo);
-		
-		lblCurrency = SimpleComponentCreator.createBasicLabel("currencyLabel", "Currency", WHITE);
-		lblCurrency.setBounds(22, 225, 70, 15);
-		contentPane.add(lblCurrency);
-		
-		lblCategory = SimpleComponentCreator.createBasicLabel("categoryLabel", "Category", WHITE);
-		lblCategory.setBounds(22, 277, 70, 15);
-		contentPane.add(lblCategory);
-		
-		lblRarity = SimpleComponentCreator.createBasicLabel("rarityLabel", "Rarity", WHITE);
-		lblRarity.setBounds(22, 328, 70, 15);
-		contentPane.add(lblRarity);
-		
-		lblAttunement = SimpleComponentCreator.createBasicLabel("attunementLabel", "Attunement", WHITE);
-		lblAttunement.setBounds(22, 380, 92, 15);
-		contentPane.add(lblAttunement);
-
-		exportComboBox = SimpleComponentCreator.createBasicComboBox("exportComboBox", exportOptions);
 		exportButton = SimpleComponentCreator.createBasicButton("exportButton", "Export table", this::exportAction);
-		exportButton.setBounds(22, 615, 110, 25);
+		exportButton.setBounds(16, 615, 120, 25);
 		contentPane.add(exportButton);
-
-		recordCounter = SimpleComponentCreator.createBasicLabel("recordCounterLabel", "Records: 0", WHITE);
-		recordCounter.setBounds(30, 640, 110, 20);
-		contentPane.add(recordCounter);
-
-		panel = new JPanel();
-		panel.setBounds(158, 0, 1025, 661);
-		contentPane.add(panel);
-		panel.setLayout(new GridLayout(1, 0, 0, 0));
-		
-		scrollPane = new JScrollPane();
-		panel.add(scrollPane);
-
+	}
+	
+	private void initializeScrollableTableWithMenu() {
 		table = new JTable(new DefaultTableModel(new Object[] {
 				"ID", "Title", "Description", "Category", "Rarity", "Price", "Coin", "Attunement" }, 0)) {
 			private static final long serialVersionUID = 1L;
@@ -302,47 +377,8 @@ public class MainWindow {
 		// column id can be selected only from model not from table:
 		table.getColumnModel().removeColumn(table.getColumn("ID"));
 
-        updateItem = new JMenuItem("Update magic item");
-        updateItem.addActionListener(e -> {
-			JDialog f = new JDialog(frame, "Update Magic Item", true);
-			f.setSize(555, 680);
-			f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			f.setLocationRelativeTo(null);
-
-			if (updatePanel == null) {
-				try {
-					updatePanel = new MagicItemCreatePanel(ImageIO.read(
-							MainWindow.class.getClassLoader().getResourceAsStream("images/background_images/gladiator.jpg")), WindowType.UPDATE);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			CMap tableData = getSelectedRowData();
-			updatePanel.initializeValues(tableData);
-			f.setResizable(false);
-			f.add(updatePanel);
-			f.setVisible(true);
-		});
-        JMenuItem deleteItem = new JMenuItem("Delete magic item");
-        deleteItem.addActionListener(e -> {
-        	// throw confirmation dialog before delete
-			CMap deletedMagicItem = getSelectedRowData();
-			int selection = JOptionPane.showConfirmDialog(frame, "Magic item \"" + deletedMagicItem.getString("title") + "\"", "Delete magic item", JOptionPane.YES_NO_OPTION);
-			switch (selection) {
-			case JOptionPane.YES_OPTION:
-				magicItemService.deleteMagicItem(deletedMagicItem);
-				break;
-			default:
-				break;
-			}
-		});
-        popupMenu.add(updateItem);
-        popupMenu.add(deleteItem);
         table.setComponentPopupMenu(popupMenu);
-
 		scrollPane.setViewportView(table);
-
-		frame.setVisible(true);
 	}
 
 	private CMap getSelectedRowData() {
@@ -419,18 +455,21 @@ public class MainWindow {
 			JOptionPane.showMessageDialog(frame, ex.getMessage(), "Search error", JOptionPane.WARNING_MESSAGE);
 		}
 	}
-	
+
 	private QueryParams getValuesAsQueryParams() {
 		QueryParams queryParams = new QueryParams();
-		if (!textField.getText().isEmpty())
+		if (!textField.getText().isEmpty()) {
 			queryParams.addParam("description", textField.getText());
-		if (!textField_1.getText().isEmpty())
+		}
+		if (!textField_1.getText().isEmpty()) {
 			queryParams.addParam("title", textField_1.getText());
-		if (!textField_2.getText().isEmpty())
+		}
+		if (!textField_2.getText().isEmpty()) {
 			queryParams.addParam("from", textField_2.getText());
-		if (!textField_3.getText().isEmpty())	
+		}
+		if (!textField_3.getText().isEmpty()) {
 			queryParams.addParam("to", textField_3.getText());
-
+		}
 		if (!((String) comboBox.getSelectedItem()).isEmpty()) {
 			queryParams.addParam("coin_id", getEnumIdBySelectedComboBoxValue(coinEnum, "coin", comboBox));
 		}
@@ -470,11 +509,15 @@ public class MainWindow {
 	}
 
 	private void exportAction(ActionEvent actionEvent) {
-		JOptionPane.showConfirmDialog(frame, exportComboBox, "Choose output format", JOptionPane.DEFAULT_OPTION);
+		int option = JOptionPane.showConfirmDialog(frame, exportComboBox, "Choose output format", JOptionPane.DEFAULT_OPTION);
+		// if one closes the first window there is no point of opening the second one..
+		if ((option == JOptionPane.CLOSED_OPTION)) {
+			return;
+		}
 		int format = exportComboBox.getSelectedIndex();
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int option = fileChooser.showOpenDialog(frame);
+		option = fileChooser.showOpenDialog(frame);
 		if (option == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			magicItemService.exportToFile(getValuesAsQueryParams(), file.getAbsolutePath(), resolveFormat(format));

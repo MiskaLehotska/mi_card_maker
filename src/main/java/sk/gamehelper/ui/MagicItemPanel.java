@@ -33,7 +33,7 @@ import sk.gamehelper.exceptions.RequiredFieldValidationError;
 import sk.gamehelper.helpers.CMap;
 import sk.gamehelper.services.MagicItemService;
 
-public class MagicItemCreatePanel extends JPanel {
+public class MagicItemPanel extends JPanel {
 
 	private static final long serialVersionUID = 7797469423579293767L;
 
@@ -67,7 +67,7 @@ public class MagicItemCreatePanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public MagicItemCreatePanel(Image image, WindowType type) {		
+	public MagicItemPanel(Image image, WindowType type) {		
 		this.magicItemService = AccessibleContext.getBean(MagicItemService.class);
 		this.image = image;
 		this.type = type;

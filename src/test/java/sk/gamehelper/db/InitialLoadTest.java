@@ -29,9 +29,6 @@ class InitialLoadTest {
 	@Test
 	@DisplayName("Test for valid data after initial load based on timestamp")
 	void loadTest() {
-		// TODO: dorobit test na to, ci v den zapisu novych dat do databazy sa tam 
-		// nachadzaju naozaj len tie, ktorych t_write nie je skor ako den tohto noveho loadu
-		//mam db
 		Database db = context.getBean(Database.class);
 		
 		LocalDateTime before = LocalDateTime.of(2022, 10, 11, 00, 00);
@@ -46,6 +43,5 @@ class InitialLoadTest {
 				.count();
 		
 		Assertions.assertEquals(0, count);
-	
 	}
 }

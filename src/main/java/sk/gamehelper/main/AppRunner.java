@@ -23,7 +23,7 @@ public class AppRunner {
 
 			// i need database object here to perform explicit selects
 			Database db = context.getBean(Database.class);
-
+			
 			// give me coin id by coin acronym (gp)
 			Long coinId = db.select("n_id")
 				.from(Table.COIN_ENUM)
@@ -93,7 +93,7 @@ public class AppRunner {
 			System.out.println(db.select()
 				.from(Table.RARITY_ENUM)
 				.where("n_id", QueryOperator.LESS_THAN, 100)
-				.orderBy(1, OrderByDirection.DESC)
+				.orderBy("1", OrderByDirection.DESC)
 				.limit(3)
 				.asList());
 			
@@ -131,9 +131,16 @@ public class AppRunner {
 				.limit(1)
 				.asMap();
 			mItem.setByData(lastMagicItem);
+			// IDs after update should not change... but in this case, when they are PK...there is a problem
 			System.out.println("old id before update: " + mItem.getId());
 			mItem.update();
 			System.out.println("new id after update: " + mItem.getId());
+			
+			db.select()
+			  .from("ref.v_formular")
+			  .whereIsNotNull("n_ziadost_id")
+			  .whereBetween("n_ziadost_stav_id", 1, 7)
+			  .asList();
 		}
 	}
 }

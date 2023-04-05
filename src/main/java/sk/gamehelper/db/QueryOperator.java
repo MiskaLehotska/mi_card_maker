@@ -1,7 +1,6 @@
 package sk.gamehelper.db;
 
 public enum QueryOperator {
-
 	EQUALS(" = "),
 	LESS_THAN(" < "),
 	LESS_THAN_EQUAL(" <= "),
@@ -9,7 +8,9 @@ public enum QueryOperator {
 	GREATER_THAN_EQUAL(" >= "),
 	NOT_EQUAL(" <> "),
 	LIKE(" LIKE '%"),
-	NOT_LIKE(" NOT LIKE '%");
+	NOT_LIKE(" NOT LIKE '%"),
+	IS_NULL(" IS NULL"),
+	IS_NOT_NULL(" IS NOT NULL");
 
 	private String operatorValue;
 
@@ -26,6 +27,9 @@ public enum QueryOperator {
 		case "LIKE":
 		case "NOT LIKE":
 			return this.operatorValue + value + "%'";
+		case "IS_NULL":
+		case "IS_NOT_NULL":
+			return this.operatorValue;
 		default:
 			if (value instanceof CharSequence) {
 				value = "'" + value + "'";

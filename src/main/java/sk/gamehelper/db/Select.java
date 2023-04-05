@@ -1,8 +1,11 @@
 package sk.gamehelper.db;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,8 +30,7 @@ public final class Select {
 	private boolean distinctAlreadyApplied;
 	private int requestedColumnsCount;
 	private int limit;
-	private Object orderByColumn;
-	private OrderByDirection direction;
+	private Set<OrderBy> orderByColumns;
 	private RowMapper<CMap> cMapRowMapper;
 	private ColumnNameTranslator fieldTranslator;
 
@@ -38,7 +40,7 @@ public final class Select {
 		this.whereBuilder = new StringBuilder();
 		this.requestedColumnsCount = columns.length;
 		this.cMapRowMapper = rowMapper;
-		this.direction = OrderByDirection.ASC;
+		this.orderByColumns = new LinkedHashSet<>();
 		this.fieldTranslator = new ColumnNameTranslator();
 		select(columns);
 	}
@@ -71,8 +73,8 @@ public final class Select {
 	}
 
 	public Select from(String tableName) {
-		selectBuilder.append(" FROM ");
-		selectBuilder.append(tableName);
+		selectBuilder.append(" FROM ")
+					 .append(tableName);
 		return this;
 	}
 
@@ -80,12 +82,19 @@ public final class Select {
 		return where(column, QueryOperator.EQUALS, value);
 	}
 
+	/*
+	 * TODO: sanitize the inner select = must contain one return column
+	 * must return one column even if there is "WHERE IN"
+	 * 
+	 * select * from ref.t_formular where n_ziadost_id = (one column + where)
+	 * select * from ref.t_formular where n_ziadost_id in (one column)
+	 */
 	public Select where(String column, Select innerSelect) {
 		appendWhereClauseConnector();
-		whereBuilder.append(column);
-		whereBuilder.append(" = (");
-		whereBuilder.append(innerSelect.selectBuilder);
-		whereBuilder.append(")");
+		whereBuilder.append(column)
+					.append(" = (")
+					.append(innerSelect.selectBuilder)
+					.append(")");
 		return this;
 	}
 
@@ -100,8 +109,8 @@ public final class Select {
 
 	public Select where(String column, QueryOperator queryOperator, Object value) {
 		appendWhereClauseConnector();
-		whereBuilder.append(column);
-		whereBuilder.append(queryOperator.applyOperationOnValue(value));
+		whereBuilder.append(column)
+					.append(queryOperator.applyOperationOnValue(value));
 		return this;
 	}
 
@@ -129,8 +138,8 @@ public final class Select {
 		}
 
 		appendWhereClauseConnector();
-		whereBuilder.append(column);
-		whereBuilder.append(" IN (");
+		whereBuilder.append(column)
+					.append(" IN (");
 
 		Stream<String> valuesJoiningStream = values.stream().map(String::valueOf);
 		if (values.get(0) instanceof CharSequence) {
@@ -140,8 +149,23 @@ public final class Select {
 					.map(val -> val.replace('"', '\''))
 					.map(val -> "\"".concat(val).concat("\""));
 		}
-		whereBuilder.append(valuesJoiningStream.collect(Collectors.joining(",")));
-		whereBuilder.append(")");
+		whereBuilder.append(valuesJoiningStream.collect(Collectors.joining(",")))
+					.append(")");
+		return this;
+	}
+
+	// TODO: implement
+	public Select whereBetween(String column, Object leftValue, Object rightValue) {
+		return this;
+	}
+
+	public Select whereIsNull(String column) {
+		where(column, QueryOperator.IS_NULL, null);
+		return this;
+	}
+
+	public Select whereIsNotNull(String column) {
+		where(column, QueryOperator.IS_NOT_NULL, null);
 		return this;
 	}
 
@@ -188,16 +212,16 @@ public final class Select {
 		}
 
 		public Join(String table, String joinType) {
-			selectBuilder.append(joinType);
-			selectBuilder.append(INNER_JOIN);
-			selectBuilder.append(table);
+			selectBuilder.append(joinType)
+						 .append(INNER_JOIN)
+						 .append(table);
 		}
 
 		public Select on(String leftColumn, String rightColumn) {
-			selectBuilder.append(" ON ");
-			selectBuilder.append(leftColumn);
-			selectBuilder.append(" = ");
-			selectBuilder.append(rightColumn);
+			selectBuilder.append(" ON ")
+						 .append(leftColumn)
+						 .append(" = ")
+						 .append(rightColumn);
 			return Select.this;
 		}
 
@@ -207,12 +231,12 @@ public final class Select {
 			int moreColumnsLength = moreColumns.length;
 			if (moreColumnsLength != 0 && moreColumnsLength % 2 == 0) {
 				for (int i = 0, j = 1; j < moreColumnsLength; i++, j++) {
-					selectBuilder.append(" AND ");
-					selectBuilder.append(moreColumns[i]);
-					selectBuilder.append(" = ");
-					selectBuilder.append(moreColumns[j]);
+					selectBuilder.append(" AND ")
+								 .append(moreColumns[i])
+								 .append(" = ")
+								 .append(moreColumns[j]);
 				}
-			} 
+			}
 			// add some exception if moreColumns is not empty?
 			return Select.this;
 		}
@@ -222,10 +246,42 @@ public final class Select {
 		this.limit = howMany;
 		return this;
 	}
-	
+
+	public class OrderBy {
+
+		private String column;
+		private OrderByDirection direction;
+
+		public OrderBy(String column, OrderByDirection direction) {
+			this.column = column;
+			this.direction = direction;
+		}
+
+		public String getColumn() {
+			return this.column;
+		}
+
+		public OrderByDirection getDirection() {
+			return this.direction;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(column);
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (other instanceof OrderBy) {
+				return this.column.equals(((OrderBy)other).getColumn());
+			}
+			return false;
+		}
+	}
+
 	public enum OrderByDirection {
-		ASC(" ASC"),
-		DESC(" DESC");
+		ASC("ASC"),
+		DESC("DESC");
 
 		private String direction;
 
@@ -233,19 +289,17 @@ public final class Select {
 			this.direction = direction;
 		}
 
-		public String getDirection() {
+		public String getValue() {
 			return this.direction;
 		}
 	}
 
-	public Select orderBy(Object column) {
+	public Select orderBy(String column) {
 		return orderBy(column, OrderByDirection.ASC);
 	}
 
-	// TODO: validate object column type against string or integer
-	public Select orderBy(Object column, OrderByDirection direction) {
-		this.orderByColumn = column;
-		this.direction = direction;
+	public Select orderBy(String column, OrderByDirection direction) {
+		this.orderByColumns.add(new OrderBy(column, direction));
 		return this;
 	}
 
@@ -295,7 +349,7 @@ public final class Select {
 	private void appendRemainingParts() {
 		appendWhereStatements();
 
-		if (orderByColumn != null) {
+		if (!orderByColumns.isEmpty()) {
 			appendOrderBy();
 		}
 
@@ -310,13 +364,16 @@ public final class Select {
 
 	private void appendOrderBy() {
 		selectBuilder.append(" ORDER BY ");
-		selectBuilder.append(orderByColumn);
-		selectBuilder.append(direction.getDirection());
+
+		String columns = orderByColumns.stream()
+			.map(e -> e.getColumn() + " " + e.getDirection().getValue())
+			.collect(Collectors.joining(","));
+
+		selectBuilder.append(columns);
 	}
 
 	private void appendLimit() {
-		selectBuilder.append(" LIMIT ");
-		selectBuilder.append(limit);
+		selectBuilder.append(" LIMIT ").append(limit);
 	}
 
 	private <T> T queryForObject(Class<T> classObj) {
